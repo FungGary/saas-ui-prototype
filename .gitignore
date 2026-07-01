@@ -1,0 +1,66 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs
+admin/dist/
+admin/dist_prod/
+admin/dist_deploy/
+admin/dist_old*/
+admin/dist_shipping_check/
+admin/dist_bag_new_check/
+admin/.dev-server/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env.local
+.env.*.local
+
+# Temporary files
+*.tmp
+*.temp
+
+# IDE work files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Dependencies cache
+.npm/
+.yarn/
+
+# Vite cache
+.vite/
+
+# Test coverage
+coverage/
+
+# Temporary development files
+*.local
+
+# Workspace files
+*.code-workspace
+verify-menu.js
+
+# System
+%SystemDrive%/
+.trae/
+.workbuddy/
+

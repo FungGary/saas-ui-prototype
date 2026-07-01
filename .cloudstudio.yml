@@ -1,0 +1,17 @@
+name: SAAS-UI Admin
+description: 线上娃娃机 SaaS 平台管理后台
+repository: https://github.com/FungGary/saas
+
+workspace:
+  name: saas-ui-admin
+  image: vuejs
+
+build:
+  command: npm install && npm run build
+  cwd: admin
+  env:
+    NODE_ENV: production
+
+deploy:
+  type: static
+  dist: admin/dist_prod

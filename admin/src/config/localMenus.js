@@ -1,0 +1,362 @@
+/**
+ * 本地菜单配置文件
+ * 用于扩展和覆盖后端菜单结构
+ * 菜单结构支持多层级嵌套
+ */
+
+// 默认的本地菜单（用于独立工作模式）
+const defaultLocalMenus = [
+  {
+    path: '/admin/finance',
+    name: '财务',
+    title: '财务管理',
+    icon: 'el-icon-money',
+    pid: 0,
+    is_show: 1,
+    children: [
+      {
+        path: '/admin/finance/user_recharge/index',
+        name: '充值记录',
+        title: '充值记录',
+        icon: 'el-icon-recharge',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/finance/finance/refundRecord',
+        name: '退款记录',
+        title: '退款记录',
+        icon: 'el-icon-refresh-left',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/finance/user_extract/index',
+        name: '提现申请',
+        title: '提现申请',
+        icon: 'el-icon-s-finance',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/finance/finance/commission',
+        name: '佣金记录',
+        title: '佣金记录',
+        icon: 'el-icon-coin',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/finance/balance/balance',
+        name: '余额记录',
+        title: '余额记录',
+        icon: 'el-icon-wallet',
+        pid: 1,
+        is_show: 1,
+      },
+    ],
+  },
+  {
+    path: '/admin/setting',
+    name: '设置',
+    title: '设置',
+    icon: 'el-icon-setting',
+    pid: 0,
+    is_show: 1,
+    children: [
+      {
+        path: '/admin/setting/copyright',
+        name: '网站设置',
+        title: '网站设置',
+        icon: 'el-icon-monitor',
+        pid: 1,
+        is_show: 1,
+        children: [
+          {
+            path: '/admin/setting/copyright',
+            name: '版权设置',
+            title: '版权设置',
+            pid: 2,
+            is_show: 1,
+          },
+        ],
+      },
+      {
+        path: '/admin/setting/membership_level/index',
+        name: '会员设置',
+        title: '会员设置',
+        icon: 'el-icon-s-custom',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/setting/notification',
+        name: '消息管理',
+        title: '消息管理',
+        icon: 'el-icon-bell',
+        pid: 1,
+        is_show: 1,
+        children: [
+          {
+            path: '/admin/setting/notification/index',
+            name: '系统通知',
+            title: '系统通知',
+            pid: 2,
+            is_show: 1,
+          },
+        ],
+      },
+      {
+        path: '/admin/setting/agreement',
+        name: '协议管理',
+        title: '协议管理',
+        icon: 'el-icon-document',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/setting/agreement_category/index',
+        name: '协议类型管理',
+        title: '协议类型管理',
+        icon: 'el-icon-menu',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/setting/system_role/index',
+        name: '身份管理',
+        title: '身份管理',
+        icon: 'el-icon-s-custom',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/setting/system_admin/index',
+        name: '管理员列表',
+        title: '管理员列表',
+        icon: 'el-icon-user-solid',
+        pid: 1,
+        is_show: 1,
+      },
+    ],
+  },
+  {
+    path: '/admin/order',
+    name: '订单管理',
+    title: '订单管理',
+    icon: 'el-icon-s-order',
+    pid: 0,
+    is_show: 1,
+    children: [
+      {
+        path: '/admin/order/offline',
+        name: '收银订单',
+        title: '收银订单',
+        icon: 'el-icon-shopping-cart',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/order/refund',
+        name: '售后订单',
+        title: '售后订单',
+        icon: 'el-icon-refresh-left',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/order/invoice/list',
+        name: '发票管理',
+        title: '发票管理',
+        icon: 'el-icon-file-text',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/order/bag',
+        name: '背包管理',
+        title: '背包管理',
+        icon: 'el-icon-backpack',
+        pid: 1,
+        is_show: 0,
+      },
+      {
+        path: '/admin/order/shipping',
+        name: '发货管理',
+        title: '发货管理',
+        icon: 'el-icon-truck',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/order/bag_new',
+        name: '背包管理',
+        title: '背包管理',
+        icon: 'el-icon-backpack',
+        pid: 1,
+        is_show: 1,
+      },
+    ],
+  },
+  {
+    path: '/admin/game',
+    name: '房间',
+    title: '房间',
+    icon: 'el-icon-gamepad',
+    pid: 0,
+    is_show: 1,
+    children: [
+      {
+        path: '/admin/game/room/roomList',
+        name: '房间列表',
+        title: '房间列表',
+        icon: 'el-icon-door',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/game/review/list',
+        name: '审核管理',
+        title: '审核管理',
+        icon: 'el-icon-circle-check',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/game/appeal',
+        name: '申诉管理',
+        title: '申诉管理',
+        icon: 'el-icon-warning-outline',
+        pid: 1,
+        is_show: 1,
+        children: [
+          {
+            path: '/admin/game/appeal/list',
+            name: '申诉列表',
+            title: '申诉列表',
+            pid: 2,
+            is_show: 1,
+          },
+          {
+            path: '/admin/game/appeal/blacklist',
+            name: '申诉黑名单',
+            title: '申诉黑名单',
+            pid: 2,
+            is_show: 1,
+          },
+        ],
+      },
+      {
+        path: '/admin/game/config',
+        name: '配置管理',
+        title: '配置管理',
+        icon: 'el-icon-setting',
+        pid: 1,
+        is_show: 1,
+        children: [
+          {
+            path: '/admin/game/config/backpack',
+            name: '背包配置',
+            title: '背包配置',
+            pid: 2,
+            is_show: 1,
+          },
+          {
+            path: '/admin/game/config/clawMachine',
+            name: '娃娃机配置',
+            title: '娃娃机配置',
+            pid: 2,
+            is_show: 1,
+          },
+          {
+            path: '/admin/game/config/recharge',
+            name: '充值配置',
+            title: '充值配置',
+            pid: 2,
+            is_show: 1,
+          },
+          {
+            path: '/admin/game/config/icon',
+            name: 'icon配置',
+            title: 'icon配置',
+            pid: 2,
+            is_show: 1,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: '/admin/marketing',
+    name: '营销',
+    title: '营销',
+    icon: 'el-icon-present',
+    pid: 0,
+    is_show: 1,
+    children: [
+      {
+        path: '/admin/marketing/store_integral',
+        name: '积分商品',
+        title: '积分商品',
+        icon: 'el-icon-coin',
+        pid: 1,
+        is_show: 1,
+      },
+      {
+        path: '/admin/marketing/exchange_code',
+        name: '兑换口令',
+        title: '兑换口令',
+        icon: 'el-icon-key',
+        pid: 1,
+        is_show: 1,
+        children: [
+          {
+            path: '/admin/marketing/exchange_code/index',
+            name: '兑换口令列表',
+            title: '兑换口令列表',
+            pid: 2,
+            is_show: 1,
+          },
+          {
+            path: '/admin/marketing/recharge_package',
+            name: '充值套餐列表',
+            title: '充值套餐列表',
+            pid: 2,
+            is_show: 1,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: '/admin/merchant',
+    name: '商户管理',
+    title: '商户管理',
+    icon: 'el-icon-shop',
+    pid: 0,
+    is_show: 1,
+    children: [
+      {
+        path: '/admin/merchant/param_config',
+        name: '参数配置',
+        title: '参数配置',
+        icon: 'el-icon-setting',
+        pid: 1,
+        is_show: 1,
+      },
+    ],
+  },
+];
+
+export default {
+  // 是否启用本地菜单配置
+  enabled: true,
+
+  // 本地菜单数据，覆盖或扩展后端菜单
+  localMenus: defaultLocalMenus,
+
+  // 获取默认菜单（用于独立工作模式）
+  getDefaultMenus() {
+    return defaultLocalMenus;
+  },
+};

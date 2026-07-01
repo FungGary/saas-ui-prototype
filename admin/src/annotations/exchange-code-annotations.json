@@ -1,0 +1,235 @@
+{
+    "project": {
+        "name": "在线抓娃娃 SaaS 平台",
+        "version": "V2.0"
+    },
+    "pages": [
+        {
+            "pageId": "EXCHANGE-CODE-LIST",
+            "pageName": "兑换口令列表页",
+            "route": "/admin/marketing/exchange_code/list",
+            "routeName": "marketing_exchangeCode",
+            "annotations": ["E001", "E002", "E003", "E006", "E007", "E008"]
+        },
+        {
+            "pageId": "EXCHANGE-CODE-ADD-MODAL",
+            "pageName": "添加口令弹窗",
+            "route": "兑换口令列表内弹窗",
+            "annotations": ["E004", "E005"]
+        }
+    ],
+    "annotations": [
+        {
+            "id": "E001",
+            "pageId": "EXCHANGE-CODE-LIST",
+            "pageName": "兑换口令列表页",
+            "targetElementId": "col-total-count",
+            "selector": "el-table-column[id=col-total-count]",
+            "locationType": "id",
+            "type": "新增",
+            "title": "总兑换次数字段新增",
+            "description": "新增字段，显示该口令的总兑换次数。",
+            "businessRule": [
+                "字段位于奖品类型列之后，可兑换次数列之前",
+                "显示该兑换口令可兑换的总次数",
+                "一次性兑换码总次数为1，长期兑换码为设置的总次数"
+            ],
+            "interaction": ["纯展示字段，不可点击", "数值为正整数"],
+            "state": ["正常显示状态"],
+            "permission": ["有兑换口令管理权限的角色可见"],
+            "priority": "P0",
+            "version": "V1.0",
+            "source": "页面代码 index.vue L180",
+            "status": "confirmed"
+        },
+        {
+            "id": "E002",
+            "pageId": "EXCHANGE-CODE-LIST",
+            "pageName": "兑换口令列表页",
+            "targetElementId": "col-available-count",
+            "selector": "el-table-column[id=col-available-count]",
+            "locationType": "id",
+            "type": "优化",
+            "title": "可兑换次数字段名称修改",
+            "description": "字段名称改为'可兑换次数'，表示当前剩余可用次数。",
+            "businessRule": [
+                "字段位于总兑换次数列之后，已兑换次数列之前",
+                "显示当前剩余可兑换的次数",
+                "可兑换次数 = 总兑换次数 - 已兑换次数"
+            ],
+            "interaction": ["纯展示字段，不可点击", "数值为正整数或0"],
+            "state": ["正常显示状态"],
+            "permission": ["有兑换口令管理权限的角色可见"],
+            "priority": "P0",
+            "version": "V1.0",
+            "source": "页面代码 index.vue L181-L186",
+            "status": "confirmed"
+        },
+        {
+            "id": "E003",
+            "pageId": "EXCHANGE-CODE-LIST",
+            "pageName": "兑换口令列表页",
+            "targetElementId": "exchange-code-filter-form",
+            "selector": "el-form[id=exchange-code-filter-form]",
+            "locationType": "id",
+            "type": "新增",
+            "title": "筛选条件补充",
+            "description": "新增筛选条件：口令搜索、口令类型、生效时间。",
+            "businessRule": [
+                "口令搜索：支持按口令、ID或备注关键词进行模糊搜索",
+                "口令类型：支持按一次性兑换码、长期兑换码进行筛选",
+                "生效时间：支持按日期范围筛选生效时间在范围内的口令",
+                "所有筛选条件可组合使用，点击查询按钮触发筛选"
+            ],
+            "interaction": [
+                "口令搜索：输入关键词后点击查询进行筛选",
+                "口令类型：下拉选择后点击查询进行筛选",
+                "生效时间：选择日期范围后点击查询进行筛选",
+                "点击重置按钮清空所有筛选条件"
+            ],
+            "state": ["默认状态", "已选状态", "空状态"],
+            "permission": ["有兑换口令管理权限的角色可见"],
+            "priority": "P0",
+            "version": "V1.0",
+            "source": "页面代码 index.vue L12-L78",
+            "status": "confirmed"
+        },
+        {
+            "id": "E004",
+            "pageId": "EXCHANGE-CODE-ADD-MODAL",
+            "pageName": "添加口令弹窗",
+            "targetElementId": "add-code-type-tip",
+            "selector": "#add-code-type-tip",
+            "locationType": "id",
+            "type": "优化",
+            "title": "口令类型说明",
+            "description": "一次性仅可用一次，长期可按次数重复兑换。",
+            "businessRule": [
+                "说明文字位于口令类型单选框组正下方",
+                "用于帮助用户理解两种口令类型的区别",
+                "一次性兑换码：每个口令只能使用一次",
+                "长期兑换码：每个口令可按设置的次数重复兑换"
+            ],
+            "interaction": ["纯展示文字，不可点击", "字体颜色为浅灰色，字号比正常表单文字略小"],
+            "state": ["正常显示状态"],
+            "permission": ["有兑换口令管理权限的角色可见"],
+            "priority": "P1",
+            "version": "V1.0",
+            "source": "组件 AddCodeModal.vue L22",
+            "status": "confirmed"
+        },
+        {
+            "id": "E005",
+            "pageId": "EXCHANGE-CODE-ADD-MODAL",
+            "pageName": "添加口令弹窗",
+            "targetElementId": "add-code-reset-btn",
+            "selector": "#add-code-reset-btn",
+            "locationType": "id",
+            "type": "优化",
+            "title": "重置按钮风险提示",
+            "description": "点击重置前需二次确认是否清空已填内容。",
+            "businessRule": [
+                "重置按钮位于弹窗底部左侧，白底灰边框样式",
+                "点击重置按钮不立即清空表单，先弹出二次确认弹窗",
+                "确认弹窗标题为'提示'，内容为'是否清空已填内容？'",
+                "确认弹窗包含'确定'和'取消'两个按钮",
+                "仅当用户点击'确定'时，才清空表单内容"
+            ],
+            "interaction": [
+                "点击重置按钮弹出确认弹窗",
+                "点击确认弹窗'确定'按钮：清空表单所有已填内容",
+                "点击确认弹窗'取消'按钮：关闭确认弹窗，保留已填内容",
+                "点击确认弹窗遮罩层：关闭确认弹窗，保留已填内容"
+            ],
+            "state": ["默认状态", "悬停状态", "点击状态"],
+            "permission": ["有兑换口令管理权限的角色可操作"],
+            "priority": "P1",
+            "version": "V1.0",
+            "source": "组件 AddCodeModal.vue L80",
+            "status": "confirmed"
+        },
+        {
+            "id": "E006",
+            "pageId": "EXCHANGE-CODE-LIST",
+            "pageName": "兑换口令列表页",
+            "targetElementId": "status-tabs",
+            "selector": "el-tabs",
+            "locationType": "selector",
+            "type": "优化",
+            "title": "状态字段优化-新增状态",
+            "description": "增加待生效、部分使用状态，区分生效时间未到以及口令部分使用的情况。",
+            "businessRule": [
+                "状态类型包括：全部、待使用、部分使用、已使用、未生效、已失效",
+                "待使用：口令已创建且在有效期内，尚未被使用",
+                "部分使用：长期兑换码已被使用但未用完",
+                "已使用：一次性兑换码已使用或长期兑换码已用完",
+                "未生效：口令已创建但生效时间未到",
+                "已失效：口令已过期或被取消"
+            ],
+            "interaction": [
+                "点击Tab切换状态筛选",
+                "每个Tab显示对应状态的数量",
+                "切换时页码重置为第1页"
+            ],
+            "state": ["激活状态", "未激活状态"],
+            "permission": ["有兑换口令管理权限的角色可见"],
+            "priority": "P0",
+            "version": "V1.0",
+            "source": "页面代码 index.vue L83-L91",
+            "status": "confirmed"
+        },
+        {
+            "id": "E007",
+            "pageId": "EXCHANGE-CODE-LIST",
+            "pageName": "兑换口令列表页",
+            "targetElementId": "col-status",
+            "selector": "el-table-column[label=状态]",
+            "locationType": "selector",
+            "type": "优化",
+            "title": "状态字段优化-显示优化",
+            "description": "状态标签样式优化，不同状态使用不同颜色区分。",
+            "businessRule": [
+                "待使用：绿色背景",
+                "部分使用：蓝色背景",
+                "已使用：灰色背景",
+                "未生效：橙色背景",
+                "已失效：红色背景",
+                "状态标签使用圆角矩形样式"
+            ],
+            "interaction": ["纯展示字段，不可点击"],
+            "state": ["正常显示状态"],
+            "permission": ["有兑换口令管理权限的角色可见"],
+            "priority": "P1",
+            "version": "V1.0",
+            "source": "页面代码 index.vue L196-L202",
+            "status": "confirmed"
+        },
+        {
+            "id": "E008",
+            "pageId": "EXCHANGE-CODE-LIST",
+            "pageName": "兑换口令列表页",
+            "targetElementId": "filter-keyword-item",
+            "selector": "#filter-keyword-item",
+            "locationType": "id",
+            "type": "新增",
+            "title": "口令搜索字段",
+            "description": "新增口令搜索框，支持按口令、ID或备注关键词进行模糊搜索。",
+            "businessRule": [
+                "搜索范围：口令code、ID、备注字段",
+                "搜索方式：模糊匹配，不区分大小写",
+                "输入框带有清除按钮，点击可快速清空输入内容"
+            ],
+            "interaction": [
+                "输入关键词后点击查询按钮进行搜索",
+                "点击清除按钮清空搜索内容",
+                "支持键盘回车键触发搜索"
+            ],
+            "state": ["空状态", "已输入状态", "清除状态"],
+            "permission": ["有兑换口令管理权限的角色可见"],
+            "priority": "P0",
+            "version": "V1.0",
+            "source": "页面代码 index.vue L32-L39",
+            "status": "confirmed"
+        }
+    ]
+}

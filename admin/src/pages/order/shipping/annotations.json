@@ -1,0 +1,426 @@
+{
+  "page": "shipping-management",
+  "pageName": "发货管理",
+  "annotations": [
+    {
+      "pointId": "list_filter_user",
+      "elementSelector": ".filter-form .el-form-item:nth-child(1)",
+      "elementType": "select",
+      "statusApplicability": ["*"],
+      "description": "用户筛选器，通过选择用户来过滤对应的发货订单",
+      "businessLogic": "支持选择具体用户或全部，选择后可查看该用户的所有发货订单",
+      "logicFlow": "点击用户下拉框 → 选择具体用户 → 点击查询按钮 → 列表刷新显示该用户的订单",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_filter_tracking_no",
+      "elementSelector": ".filter-form .el-form-item:nth-child(2)",
+      "elementType": "input",
+      "statusApplicability": ["*"],
+      "description": "快递单号筛选，输入快递单号快速定位对应订单",
+      "businessLogic": "支持模糊匹配快递单号，主要用于已发货后的订单查询",
+      "logicFlow": "输入快递单号 → 点击查询 → 列表显示匹配的订单",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_filter_source",
+      "elementSelector": ".filter-form .el-form-item:nth-child(3)",
+      "elementType": "select",
+      "statusApplicability": ["*"],
+      "description": "订单来源筛选，按订单来源类型过滤",
+      "businessLogic": "来源类型包括：背包、商城；不同来源订单处理流程可能不同",
+      "logicFlow": "选择来源类型 → 点击查询 → 列表筛选对应来源的订单",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_filter_merchant",
+      "elementSelector": ".filter-form .el-form-item:nth-child(4)",
+      "elementType": "select",
+      "statusApplicability": ["*"],
+      "description": "商户筛选器，通过选择商户来过滤对应的发货订单",
+      "businessLogic": "支持选择具体商户或全部商户，选择后可查看该商户的所有发货订单",
+      "logicFlow": "点击商户下拉框 → 选择具体商户 → 点击查询按钮 → 列表刷新显示该商户的订单",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_filter_date_range",
+      "elementSelector": ".filter-form .el-form-item:nth-child(5)",
+      "elementType": "datepicker",
+      "statusApplicability": ["*"],
+      "description": "申请日期范围筛选，按订单创建时间过滤",
+      "businessLogic": "按申请发货的日期范围进行筛选，支持选择开始和结束日期",
+      "logicFlow": "选择日期范围 → 点击查询 → 列表显示该时间范围内的订单",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_filter_reset",
+      "elementSelector": ".filter-buttons .el-button:nth-child(1)",
+      "elementType": "button",
+      "statusApplicability": ["*"],
+      "description": "重置按钮，重置所有筛选条件为默认值",
+      "businessLogic": "点击后清空所有已填写的筛选条件，恢复到初始状态",
+      "logicFlow": "点击重置按钮 → 所有筛选条件清空 → 列表恢复默认显示",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_filter_search",
+      "elementSelector": ".filter-buttons .el-button--primary",
+      "elementType": "button",
+      "statusApplicability": ["*"],
+      "description": "查询按钮，根据填写的筛选条件查询订单",
+      "businessLogic": "点击后根据筛选条件刷新列表，显示符合条件的订单",
+      "logicFlow": "填写筛选条件 → 点击查询 → 列表刷新显示符合条件的订单",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_stat_card_pending",
+      "elementSelector": ".stat-card.pending",
+      "elementType": "card",
+      "statusApplicability": ["*"],
+      "description": "待发货统计卡片，显示待发货订单数量，点击可切换到待发货Tab",
+      "businessLogic": "待发货订单是用户已申请发货、等待运营处理的订单；点击卡片快速筛选待发货订单",
+      "logicFlow": "点击统计卡片 → activeTab切换为pending → 列表只显示待发货订单",
+      "stateTransition": "待发货是订单的初始状态，可流转至待收货或申请取消"
+    },
+    {
+      "pointId": "list_stat_card_receiving",
+      "elementSelector": ".stat-card.receiving",
+      "elementType": "card",
+      "statusApplicability": ["*"],
+      "description": "待收货统计卡片，显示待收货订单数量，点击可切换到待收货Tab",
+      "businessLogic": "待收货订单是运营已发货、等待用户签收的订单；点击卡片快速筛选待收货订单",
+      "logicFlow": "点击统计卡片 → activeTab切换为receiving → 列表只显示待收货订单",
+      "stateTransition": "待发货→待收货（运营发货后）；待收货→已完成（用户签收后）"
+    },
+    {
+      "pointId": "list_stat_card_completed",
+      "elementSelector": ".stat-card.completed",
+      "elementType": "card",
+      "statusApplicability": ["*"],
+      "description": "已完成统计卡片，显示已完成订单数量，点击可切换到已完成Tab",
+      "businessLogic": "已完成订单是用户已签收、订单流程正常结束的订单；终态不可再操作",
+      "logicFlow": "点击统计卡片 → activeTab切换为completed → 列表只显示已完成订单",
+      "stateTransition": "待收货→已完成；已完成为终态"
+    },
+    {
+      "pointId": "list_stat_card_canceling",
+      "elementSelector": ".stat-card.canceling",
+      "elementType": "card",
+      "statusApplicability": ["*"],
+      "description": "申请取消统计卡片，显示申请取消订单数量，点击可切换到申请取消Tab",
+      "businessLogic": "申请取消订单是用户发起取消申请、等待运营审核的订单；点击卡片快速筛选待审核订单",
+      "logicFlow": "点击统计卡片 → activeTab切换为canceling → 列表只显示申请取消订单",
+      "stateTransition": "待发货→申请取消（用户发起）；申请取消→已取消（审核通过）/待发货（审核拒绝）"
+    },
+    {
+      "pointId": "list_stat_card_canceled",
+      "elementSelector": ".stat-card.canceled",
+      "elementType": "card",
+      "statusApplicability": ["*"],
+      "description": "已取消统计卡片，显示已取消订单数量，点击可切换到已取消Tab",
+      "businessLogic": "已取消订单是运营审核通过用户取消申请的订单；终态不可再操作",
+      "logicFlow": "点击统计卡片 → activeTab切换为canceled → 列表只显示已取消订单",
+      "stateTransition": "申请取消→已取消；已取消为终态"
+    },
+    {
+      "pointId": "list_tabs",
+      "elementSelector": ".el-tabs__header",
+      "elementType": "tabs",
+      "statusApplicability": ["*"],
+      "description": "状态Tab栏，按订单状态筛选列表数据",
+      "businessLogic": "订单状态流转：待发货→待收货→已完成；待发货→申请取消→已取消（同意）/待发货（拒绝）。点击Tab切换状态过滤，统计卡片数字为对应状态的订单总数",
+      "logicFlow": "点击Tab → 列表刷新显示对应状态的订单 → 统计卡片高亮当前选中状态",
+      "stateTransition": "待发货→待收货→已完成；待发货→申请取消→已取消/待发货"
+    },
+    {
+      "pointId": "list_batch_lock",
+      "elementSelector": ".batch-lock-wrapper .el-button",
+      "elementType": "button",
+      "statusApplicability": ["待发货", "待收货", "申请取消"],
+      "description": "批量锁单按钮，批量锁定选中的订单",
+      "businessLogic": "锁单后禁止修改收货信息、禁止修改备注、禁止发货、禁止审核取消；用于异常订单冻结处理",
+      "logicFlow": "勾选订单 → 点击批量锁单 → 弹出确认框 → 确认后批量锁定选中订单",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_batch_unlock",
+      "elementSelector": ".batch-unlock-wrapper .el-button",
+      "elementType": "button",
+      "statusApplicability": ["待发货", "待收货", "申请取消"],
+      "description": "批量解绑按钮，批量解锁选中的已锁定订单",
+      "businessLogic": "与批量锁单配套使用，解锁后订单恢复正常操作状态",
+      "logicFlow": "勾选已锁定订单 → 点击批量解绑 → 弹出确认框 → 确认后批量解锁选中订单",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_import_button",
+      "elementSelector": ".import-btn-wrapper .el-button",
+      "elementType": "button",
+      "statusApplicability": ["*"],
+      "description": "导入按钮，打开导入发货记录弹窗",
+      "businessLogic": "支持通过Excel文件批量导入发货数据，避免逐条手动发货；适用于已有发货清单需批量回写的场景",
+      "logicFlow": "点击导入 → 弹出导入弹窗 → 下载模板/上传文件 → 确认导入 → 批量更新订单状态",
+      "stateTransition": "待发货→待收货（导入成功后）"
+    },
+    {
+      "pointId": "list_export_shipping",
+      "elementSelector": ".toolbar-left .el-button:nth-child(4)",
+      "elementType": "button",
+      "statusApplicability": ["*"],
+      "description": "发货数据导出按钮，导出当前筛选条件下的发货订单数据",
+      "businessLogic": "导出内容包含订单号、商品信息、收货信息、状态等完整字段，用于离线分析、财务对账、数据备份",
+      "logicFlow": "点击发货数据导出 → 系统生成Excel文件 → 浏览器下载到本地",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_export_sku",
+      "elementSelector": ".toolbar-left .el-button:nth-child(5)",
+      "elementType": "button",
+      "statusApplicability": ["*"],
+      "description": "SKU发货导出按钮，按SKU维度导出发货数据",
+      "businessLogic": "按商品SKU聚合数据，便于仓储和供应链查看各SKU的发货总量，用于采购决策和库存管理",
+      "logicFlow": "点击SKU发货导出 → 系统按SKU聚合数据 → 生成Excel文件 → 浏览器下载",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_import_record_button",
+      "elementSelector": ".toolbar-left .el-button:nth-child(6)",
+      "elementType": "button",
+      "statusApplicability": ["*"],
+      "description": "导入记录按钮，打开导入记录弹窗查看历史导入任务",
+      "businessLogic": "每次导入操作都会生成一条导入记录，便于运营追溯和排查导入失败原因",
+      "logicFlow": "点击导入记录 → 弹出导入记录弹窗 → 展示历史导入任务列表（支持分页）",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_order_header",
+      "elementSelector": ".order-header-row, .order-group-header",
+      "elementType": "row",
+      "statusApplicability": ["*"],
+      "description": "订单头部行，显示用户信息、订单号、创建时间、来源、锁单状态",
+      "businessLogic": "每个订单都有头部信息，展示订单概要信息；包含商户信息、用户信息、订单信息、锁单开关",
+      "logicFlow": "展开/收起订单 → 显示/隐藏商品详情",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_lock_switch",
+      "elementSelector": ".lock-switch .el-switch",
+      "elementType": "switch",
+      "statusApplicability": ["待发货", "待收货", "申请取消"],
+      "description": "锁单开关，用于锁定/解锁订单，锁单后禁止修改和发货",
+      "businessLogic": "锁单后：禁止修改收货信息、禁止修改备注、禁止发货、禁止审核取消；已完成和已取消状态下开关自动禁用",
+      "logicFlow": "点击锁单开关 → 弹出确认框 → 确认后订单锁定/解锁 → 状态更新",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_product_info",
+      "elementSelector": ".goods-item, .order-products",
+      "elementType": "cell",
+      "statusApplicability": ["*"],
+      "description": "商品信息单元格，显示商品图片、名称、分类、商品ID",
+      "businessLogic": "每个订单可能包含多个商品，默认显示前3个，超过3个可展开查看全部",
+      "logicFlow": "点击展开订单 → 显示全部商品列表",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_expand_row",
+      "elementSelector": ".order-expand-row, .expand-row-content",
+      "elementType": "button",
+      "statusApplicability": ["*"],
+      "description": "商品展开/折叠按钮，展开订单查看全部商品",
+      "businessLogic": "默认显示前3条商品数据，当商品数 > 3 时显示展开入口；点击展开显示全部商品，点击收起隐藏多余商品；商品数 ≤ 3 时不显示此按钮",
+      "logicFlow": "订单商品数≤3：不显示展开按钮；订单商品数＞3：默认显示前3条+展开按钮→点击展开显示全部→点击收起恢复显示前3条",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_receiver_info",
+      "elementSelector": ".receiver-cell",
+      "elementType": "cell",
+      "statusApplicability": ["*"],
+      "description": "收货信息单元格，显示收货人、手机号、地址，支持编辑和复制",
+      "businessLogic": "除已完成、已取消状态外，其他状态未锁单时可编辑收货信息；锁单或终态下不可编辑；支持一键复制地址",
+      "logicFlow": "点击编辑图标 → 弹出修改收货信息弹窗 → 保存后更新收货信息",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_remark_user",
+      "elementSelector": ".remark-cell .remark-line:nth-child(1) .action-icon",
+      "elementType": "icon",
+      "statusApplicability": ["*"],
+      "description": "用户备注编辑，点击编辑用户备注信息",
+      "businessLogic": "所有状态下都可编辑用户备注，锁单状态下不可编辑；用户备注是用户下单时填写的特殊要求",
+      "logicFlow": "点击编辑图标 → 弹出修改备注弹窗 → 保存后更新用户备注",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_remark_merchant",
+      "elementSelector": ".remark-cell .remark-line:nth-child(2) .action-icon",
+      "elementType": "icon",
+      "statusApplicability": ["*"],
+      "description": "商家备注编辑，点击编辑商家备注信息",
+      "businessLogic": "所有状态下都可编辑商家备注，锁单状态下不可编辑；商家备注是运营人员内部记录",
+      "logicFlow": "点击编辑图标 → 弹出修改备注弹窗 → 保存后更新商家备注",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_status_tag",
+      "elementSelector": ".status-cell .status-text",
+      "elementType": "tag",
+      "statusApplicability": ["*"],
+      "description": "订单状态标签，显示当前订单状态",
+      "businessLogic": "订单状态包括：待发货、待收货、已完成、申请取消、已取消",
+      "logicFlow": "随订单操作动态更新状态显示",
+      "stateTransition": "待发货→待收货→已完成；待发货→申请取消→已取消/待发货"
+    },
+    {
+      "pointId": "list_view_logistics",
+      "elementSelector": ".status-cell .logistics-link",
+      "elementType": "link",
+      "statusApplicability": ["待收货", "已完成"],
+      "description": "查看物流链接，点击查看物流详情",
+      "businessLogic": "仅待收货和已完成状态显示，用于查看快递物流轨迹",
+      "logicFlow": "点击查看物流 → 弹出物流详情弹窗/抽屉 → 显示物流轨迹信息",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_cancel_reason",
+      "elementSelector": ".status-cell .cancel-reason",
+      "elementType": "text",
+      "statusApplicability": ["申请取消", "已取消"],
+      "description": "取消原因显示，展示用户申请取消的原因",
+      "businessLogic": "仅申请取消和已取消状态显示，用于运营了解取消原因",
+      "logicFlow": "用户提交取消申请 → 显示取消原因 → 运营审核时参考",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_ship_button",
+      "elementSelector": ".ship-btn-wrapper .el-button--primary",
+      "elementType": "button",
+      "statusApplicability": ["待发货"],
+      "description": "发货按钮，点击打开发货操作弹窗/抽屉",
+      "businessLogic": "仅待发货且未锁单状态下可点击；锁单状态下按钮禁用",
+      "logicFlow": "点击发货按钮 → 打开发货弹窗 → 填写物流信息 → 确认发货 → 订单状态变为待收货",
+      "stateTransition": "待发货 → 待收货"
+    },
+    {
+      "pointId": "list_audit_button",
+      "elementSelector": ".audit-btn-wrapper .orange-btn",
+      "elementType": "button",
+      "statusApplicability": ["申请取消"],
+      "description": "审核按钮，点击审核用户的取消申请",
+      "businessLogic": "仅申请取消状态下显示，用于审核用户的取消申请；拒绝需选择拒绝原因",
+      "logicFlow": "点击审核按钮 → 弹出审核弹窗 → 选择同意取消或拒绝取消 → 拒绝需选择拒绝原因 → 确认后更新订单状态",
+      "stateTransition": "申请取消 → 已取消（同意）；申请取消 → 待发货（拒绝）"
+    },
+    {
+      "pointId": "list_detail_button",
+      "elementSelector": ".detail-btn-wrapper .el-button--text",
+      "elementType": "button",
+      "statusApplicability": ["*"],
+      "description": "订单详情按钮，点击进入订单详情页",
+      "businessLogic": "所有状态下都可查看订单详情",
+      "logicFlow": "点击订单详情 → 跳转到订单详情页面/打开详情抽屉",
+      "stateTransition": null
+    },
+    {
+      "pointId": "list_pagination",
+      "elementSelector": ".pagination-wrapper .el-pagination",
+      "elementType": "pagination",
+      "statusApplicability": ["*"],
+      "description": "分页组件，用于翻页查看更多订单",
+      "businessLogic": "支持切换每页显示数量（10/20/50/100），支持跳转到指定页码",
+      "logicFlow": "点击页码/切换每页数量 → 列表刷新显示对应页数据",
+      "stateTransition": null
+    },
+    {
+      "pointId": "import_dialog",
+      "elementSelector": ".import-dialog-content",
+      "elementType": "dialog",
+      "statusApplicability": ["*"],
+      "description": "导入发货记录弹窗，通过上传Excel文件批量导入发货数据",
+      "businessLogic": "支持批量回写物流信息，避免逐条手动发货；仅支持.xlsx/.xls格式，一次最多导入500条；注意事项：请勿修改表头字段、发货数量必须为数字且大于0、物流单号长度不超过50位",
+      "logicFlow": "点击导入→弹出导入弹窗→下载模板→填写发货数据→上传文件→系统校验→确认导入→批量更新订单状态为待收货",
+      "stateTransition": "待发货→待收货（导入成功后）；若订单已锁单或状态不符则导入失败"
+    },
+    {
+      "pointId": "import_history_dialog",
+      "elementSelector": ".import-history-content",
+      "elementType": "dialog",
+      "statusApplicability": ["*"],
+      "description": "导入记录弹窗，查看历史导入任务的处理结果",
+      "businessLogic": "每次导入操作都会生成一条导入记录；状态分为：待处理、处理中、成功、失败四种；失败任务可查看错误数据条数",
+      "logicFlow": "点击导入记录→弹出导入记录弹窗→展示历史导入任务列表（按时间倒序，支持分页）→点击文件名可下载原始上传文件",
+      "stateTransition": null
+    },
+    {
+      "pointId": "remark_dialog",
+      "elementSelector": ".el-dialog:has(.remark-form)",
+      "elementType": "dialog",
+      "statusApplicability": ["*"],
+      "description": "修改备注弹窗，编辑用户备注或商家备注",
+      "businessLogic": "用户备注是用户下单时填写的特殊要求（如配送时间、包装要求等），商家备注是运营人员内部记录（如VIP客户、特殊处理方式等）；锁单状态下不可编辑",
+      "logicFlow": "点击编辑图标/修改备注按钮→弹出修改备注弹窗→选择备注类型→输入备注内容→点击保存→备注更新成功",
+      "stateTransition": null
+    },
+    {
+      "pointId": "receiver_dialog",
+      "elementSelector": ".el-dialog:has(.receiver-form)",
+      "elementType": "dialog",
+      "statusApplicability": ["待发货", "待收货", "申请取消"],
+      "description": "修改收货信息弹窗，编辑收货人、电话、地址",
+      "businessLogic": "用户下单后可能需要修改地址（如填错地址、搬家、收件人变更等）；待收货状态修改地址后需同步通知物流公司；已完成和已取消状态禁止修改",
+      "logicFlow": "点击编辑收货信息图标→弹出修改弹窗（自动填充当前收货信息）→修改对应字段→点击保存→校验通过后更新订单收货信息",
+      "stateTransition": "待发货/申请取消：可修改；待收货：可修改但需同步物流；已完成/已取消：禁止修改"
+    },
+    {
+      "pointId": "ship_dialog_split_type",
+      "elementSelector": ".split-section .el-radio-group",
+      "elementType": "radio",
+      "statusApplicability": ["待发货"],
+      "description": "拆分方式选择，按SKU拆分或按数量拆分",
+      "businessLogic": "按SKU拆分：相同SKU聚合为一行，适合批量发货；按数量拆分：每件商品单独一行，适合逐件发货",
+      "logicFlow": "选择拆分方式 → 商品列表重新排列 → 选择要发货的商品",
+      "stateTransition": null
+    },
+    {
+      "pointId": "ship_dialog_receiver_confirm",
+      "elementSelector": ".receiver-section .receiver-card",
+      "elementType": "card",
+      "statusApplicability": ["待发货"],
+      "description": "收货信息确认区，确认收货人、手机号、地址是否正确",
+      "businessLogic": "发货前确认收货信息，支持复制地址；如有错误可返回修改",
+      "logicFlow": "打开发货弹窗 → 展示收货信息 → 运营核对确认",
+      "stateTransition": null
+    },
+    {
+      "pointId": "ship_dialog_delivery_type",
+      "elementSelector": ".logistics-section .el-form-item:nth-child(1)",
+      "elementType": "radio",
+      "statusApplicability": ["待发货"],
+      "description": "发货方式选择，快递配送或无需物流",
+      "businessLogic": "支持快递配送和无需物流两种方式；快递配送需要填写快递公司和单号；无需物流适用于虚拟商品或自提",
+      "logicFlow": "选择发货方式 → 动态显示对应表单字段",
+      "stateTransition": null
+    },
+    {
+      "pointId": "ship_dialog_submit",
+      "elementSelector": ".dialog-footer .submit-btn-wrapper .el-button--primary",
+      "elementType": "button",
+      "statusApplicability": ["待发货"],
+      "description": "确认发货按钮，提交发货信息",
+      "businessLogic": "必须选择商品且填写完整物流信息后才可点击；提交后订单状态变为待收货",
+      "logicFlow": "选择商品 → 填写物流信息 → 点击确认发货 → 调用发货接口 → 订单状态变为待收货",
+      "stateTransition": "待发货 → 待收货"
+    },
+    {
+      "pointId": "audit_dialog",
+      "elementSelector": ".cancel-audit-dialog .el-dialog",
+      "elementType": "modal",
+      "statusApplicability": ["申请取消"],
+      "description": "取消审核弹窗，审核用户的取消申请",
+      "businessLogic": "支持同意取消和拒绝取消两种审核结果；拒绝取消必须选择拒绝原因（商品已发货/已出库/用户原因不成立/其他原因）",
+      "logicFlow": "点击审核按钮 → 弹出审核弹窗 → 选择审核结果 → 拒绝需选择拒绝原因 → 确认后更新订单状态",
+      "stateTransition": "申请取消 → 已取消（同意）；申请取消 → 待发货（拒绝）"
+    }
+  ]
+}
