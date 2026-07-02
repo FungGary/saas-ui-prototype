@@ -232,6 +232,22 @@
           </el-col>
         </el-row>
         <el-row :gutter="20">
+          <el-col :span="12">
+            <el-form-item label="用户消费等级限制" prop="consumerLevelLimit">
+              <el-select v-model="formData.consumerLevelLimit" placeholder="请选择消费等级限制" class="form-input" clearable>
+                <el-option :value="null" label="不限制"></el-option>
+                <el-option v-for="level in consumerLevelOptions" :key="level.value" :value="level.value" :label="level.label"></el-option>
+              </el-select>
+              <span class="form-tip">用户需达到所选等级（含）以上才展示本房间；留空或选择"不限制"表示无等级要求。</span>
+              <annotation-point
+                title="【新增】用户消费等级限制"
+                content="用户消费等级限制用于控制房间对不同等级用户的可见性：&#10;· 不限制：所有用户均可见该房间&#10;· 选择具体等级（如 Lv.3）：用户需达到该等级及以上（≥）才可看到本房间&#10;· 数据来源：系统已配置的消费等级列表，按升序排列&#10;&#10;应用场景：&#10;· 高价值房间仅对高消费等级用户开放，提升用户付费意愿&#10;· 配合用户等级体系，实现精细化运营"
+                priority="P0"
+              />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row :gutter="20">
           <el-col :span="24">
             <el-form-item label="房间公告" prop="roomNotice">
               <div class="notice-input-wrap">
@@ -347,8 +363,13 @@
 </template>
 
 <script>
+import AnnotationPoint from '@/components/AnnotationPoint';
+
 export default {
   name: 'EditRoomModal',
+  components: {
+    AnnotationPoint,
+  },
   props: {
     visible: {
       type: Boolean,
@@ -362,6 +383,15 @@ export default {
   data() {
     return {
       uploadUrl: '/api/upload',
+
+      consumerLevelOptions: [
+        { value: 1, label: 'Lv.1' },
+        { value: 2, label: 'Lv.2' },
+        { value: 3, label: 'Lv.3' },
+        { value: 4, label: 'Lv.4' },
+        { value: 5, label: 'Lv.5' },
+      ],
+
       formData: {
         roomNo: '',
         roomName: '',
@@ -380,6 +410,7 @@ export default {
         roomCategory: '',
         roomAttribute: '',
         sortOrder: '',
+        consumerLevelLimit: null,
         roomNotice: '',
         showOnHome: false,
         isShow: true,
@@ -437,6 +468,7 @@ export default {
         roomCategory: 'gameplay',
         roomAttribute: 'hot',
         sortOrder: '100',
+        consumerLevelLimit: 2,
         roomNotice: '新人专享福利',
         showOnHome: true,
         isShow: true,

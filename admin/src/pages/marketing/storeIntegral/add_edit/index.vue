@@ -144,91 +144,202 @@
         </div>
 
         <div v-show="currentStep === 2" class="step3-content">
-          <div class="editor-wrapper">
-            <el-form-item label="商品详情">
-              <div class="editor-container">
-                <div class="editor-toolbar">
-                  <span class="toolbar-item">字号</span>
-                  <el-select v-model="editorFontSize" class="font-size-select">
-                    <el-option :label="'12'" :value="12"></el-option>
-                    <el-option :label="'14'" :value="14"></el-option>
-                    <el-option :label="'16'" :value="16"></el-option>
-                  </el-select>
-                  <span class="toolbar-divider"></span>
-                  <button class="toolbar-btn" @click="formatText('bold')"><i class="el-icon-bold"></i></button>
-                  <button class="toolbar-btn" @click="formatText('italic')"><i class="el-icon-italic"></i></button>
-                  <button class="toolbar-btn" @click="formatText('underline')"><i class="el-icon-underline"></i></button>
-                  <span class="toolbar-divider"></span>
-                  <span class="toolbar-item">段落格式</span>
-                </div>
-                <textarea v-model="formData.description" class="rich-text-editor" :style="{ fontSize: editorFontSize + 'px' }" placeholder="请输入商品详情内容..." maxlength="10000"></textarea>
-                <div class="editor-footer">
-                  <span class="element-path">元素路径:</span>
-                  <span class="word-count">{{ formData.description.length }}/10000 字数统计</span>
-                </div>
-              </div>
-            </el-form-item>
+          <el-tabs v-model="detailTab" class="detail-tabs">
+            <el-tab-pane label="基础信息" name="basic">
+              <div class="basic-info-content">
+                <el-form :model="formData" :rules="formRules" ref="formRef" :label-width="labelWidth" :label-position="labelPosition">
+                  <el-form-item label="商品主图">
+                    <div class="image-upload-area">
+                      <div class="image-upload-card" @click="uploadMainImage">
+                        <img v-if="formData.mainImage" :src="formData.mainImage" />
+                        <i v-else class="el-icon-plus"></i>
+                      </div>
+                      <div class="image-tip">建议尺寸：800*800px</div>
+                    </div>
+                  </el-form-item>
 
-            <div class="mobile-preview">
-              <div class="phone-frame">
-                <div class="phone-header">
-                  <div class="phone-notch"></div>
-                </div>
-                <div class="phone-screen">
-                  <div class="preview-header">详情预览</div>
-                  <div class="preview-divider"></div>
-                  <div class="preview-content" v-html="formData.description || '<div class=empty-content>暂无内容</div>'"></div>
-                </div>
-              </div>
-            </div>
-          </div>
+                  <el-form-item label="轮播图">
+                    <div class="image-upload-area">
+                      <div class="image-list">
+                        <div v-for="(img, index) in formData.carouselImages" :key="index" class="carousel-image-item">
+                          <img :src="img" />
+                          <i class="el-icon-delete" @click="removeCarouselImage(index)"></i>
+                        </div>
+                        <div class="carousel-add-btn" @click="uploadCarouselImage">
+                          <i class="el-icon-plus"></i>
+                        </div>
+                      </div>
+                      <div class="image-tip">建议尺寸：800*800px，可上传多张</div>
+                    </div>
+                  </el-form-item>
 
-          <el-card :bordered="false" shadow="never" class="config-preview-card" id="config-preview-card">
-            <h3 class="preview-title">
-              配置预览
-              <annotation-point 
-                title="【新增】配置预览" 
-                content="优化前：当前没有最终配置预览。&#10;&#10;优化后：保存前展示商品、兑换积分、库存、限购、等级限制、上架状态预览。&#10;&#10;原因：让运营确认最终兑换规则。" 
-                priority="P0"
-              />
-            </h3>
-            <div class="preview-content">
-              <div class="preview-product">
-                <div class="preview-image">
-                  <img v-if="formData.mainImage" :src="formData.mainImage" />
-                  <div v-else class="no-image">暂无图片</div>
+                  <el-form-item label="商品标题" prop="title">
+                    <el-input v-model="formData.title" placeholder="请输入商品标题" class="form_content_width" />
+                  </el-form-item>
+
+                  <el-form-item label="兑换积分" prop="integral">
+                    <div class="integral-input-wrap">
+                      <el-input-number v-model="formData.integral" :min="0" class="form_content_width" />
+                      <span class="input-suffix">积分</span>
+                    </div>
+                  </el-form-item>
+
+                  <el-form-item label="库存" prop="stock">
+                    <el-input-number v-model="formData.stock" :min="0" class="form_content_width" />
+                  </el-form-item>
+
+                  <el-form-item label="限购">
+                    <div class="limit-input-group">
+                      <span>每用户最多兑换</span>
+                      <el-input-number v-model="formData.exchangeLimit" :min="0" class="limit-input" />
+                      <span>件</span>
+                      <span class="limit-divider">|</span>
+                      <span>单笔最多兑换</span>
+                      <el-input-number v-model="formData.maxExchange" :min="0" class="limit-input" />
+                      <span>件</span>
+                    </div>
+                    <div class="form-tip">设置为0表示不限制</div>
+                  </el-form-item>
+
+                  <el-form-item label="单位">
+                    <el-input v-model="formData.unit" placeholder="请输入单位" class="form_content_width" />
+                  </el-form-item>
+
+                  <el-form-item label="排序">
+                    <div>
+                      <el-input-number v-model="formData.sort" :min="0" :controls="false" class="form_content_width" />
+                      <div class="form-tip">数值越大越靠前</div>
+                    </div>
+                  </el-form-item>
+
+                  <el-form-item label="上架状态">
+                    <el-radio-group v-model="formData.status">
+                      <el-radio :label="1">上架</el-radio>
+                      <el-radio :label="0">下架</el-radio>
+                    </el-radio-group>
+                  </el-form-item>
+
+                  <el-form-item label="用户消费等级限制">
+                    <div>
+                      <el-input-number v-model="formData.levelLimit" :min="0" :controls="false" class="form_content_width" />
+                      <div class="form-tip">用户达到该等级才展示本商品；0表示不限制</div>
+                    </div>
+                  </el-form-item>
+                </el-form>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="商品详情" name="detail">
+              <div class="detail-content-wrapper">
+                <div class="detail-left">
+                  <div class="detail-label">商品详情</div>
+                  <div class="editor-container">
+                    <div class="editor-toolbar">
+                      <div class="toolbar-row">
+                        <button class="toolbar-btn" title="源码"><i class="el-icon-document"></i></button>
+                        <button class="toolbar-btn" title="撤销"><i class="el-icon-refresh-left"></i></button>
+                        <button class="toolbar-btn" title="重做"><i class="el-icon-refresh-right"></i></button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="加粗"><b>B</b></button>
+                        <button class="toolbar-btn" title="斜体"><i>I</i></button>
+                        <button class="toolbar-btn" title="下划线"><u>U</u></button>
+                        <button class="toolbar-btn" title="删除线"><s>S</s></button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="下标">x<sub>2</sub></button>
+                        <button class="toolbar-btn" title="上标">x<sup>2</sup></button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="删除格式"><i class="el-icon-delete"></i></button>
+                        <button class="toolbar-btn" title="格式刷"><i class="el-icon-brush"></i></button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="清除格式"><i class="el-icon-close"></i></button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="引用"><i class="el-icon-d-caret"></i></button>
+                        <button class="toolbar-btn" title="代码"><i class="el-icon-s-claim"></i></button>
+                        <button class="toolbar-btn" title="图片"><i class="el-icon-picture"></i></button>
+                        <button class="toolbar-btn" title="表格"><i class="el-icon-tickets"></i></button>
+                        <button class="toolbar-btn" title="表情"><i class="el-icon-service"></i></button>
+                        <button class="toolbar-btn" title="地图"><i class="el-icon-location"></i></button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="打开"><i class="el-icon-folder-opened"></i></button>
+                        <button class="toolbar-btn" title="预览"><i class="el-icon-view"></i></button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="打印"><i class="el-icon-printer"></i></button>
+                        <button class="toolbar-btn" title="全屏"><i class="el-icon-full-screen"></i></button>
+                      </div>
+                      <div class="toolbar-row">
+                        <el-select v-model="paragraphFormat" size="mini" class="toolbar-select">
+                          <el-option label="自定义标题" value=""></el-option>
+                        </el-select>
+                        <el-select v-model="blockFormat" size="mini" class="toolbar-select">
+                          <el-option label="段落" value="p"></el-option>
+                        </el-select>
+                        <el-select v-model="fontFamily" size="mini" class="toolbar-select">
+                          <el-option label="默认" value=""></el-option>
+                        </el-select>
+                        <el-select v-model="editorFontSize" size="mini" class="toolbar-select">
+                          <el-option :label="'14px'" :value="14"></el-option>
+                          <el-option :label="'12px'" :value="12"></el-option>
+                          <el-option :label="'16px'" :value="16"></el-option>
+                        </el-select>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="加粗"><b>B</b></button>
+                        <button class="toolbar-btn" title="斜体"><i>I</i></button>
+                        <button class="toolbar-btn" title="下划线"><u>U</u></button>
+                        <button class="toolbar-btn" title="删除线"><s>S</s></button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="字体颜色"><i class="el-icon-iconfont icon-color"></i><span class="btn-underline"></span></button>
+                        <button class="toolbar-btn" title="背景颜色"><i class="el-icon-iconfont icon-bgcolor"></i><span class="btn-underline"></span></button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="有序列表"><i class="el-icon-s-order"></i></button>
+                        <button class="toolbar-btn" title="无序列表"><i class="el-icon-menu"></i></button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="减少缩进"><i class="el-icon-back"></i></button>
+                        <button class="toolbar-btn" title="增加缩进"><i class="el-icon-right"></i></button>
+                        <button class="toolbar-btn" title="左对齐"><i class="el-icon-d-arrow-left"></i></button>
+                        <button class="toolbar-btn" title="居中对齐"><i class="el-icon-d-arrow-right"></i></button>
+                        <button class="toolbar-btn" title="右对齐"><i class="el-icon-more"></i></button>
+                        <button class="toolbar-btn" title="两端对齐"><i class="el-icon-s-grid"></i></button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="超链接"><i class="el-icon-link"></i></button>
+                        <button class="toolbar-btn" title="取消链接"><i class="el-icon-unlink"></i></button>
+                        <button class="toolbar-btn" title="锚点"><i class="el-icon-paperclip"></i></button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="图片"><i class="el-icon-picture"></i></button>
+                        <button class="toolbar-btn" title="附件"><i class="el-icon-folder"></i></button>
+                        <button class="toolbar-btn" title="视频"><i class="el-icon-video-camera"></i></button>
+                        <button class="toolbar-btn" title="音频"><i class="el-icon-microphone"></i></button>
+                        <span class="toolbar-divider"></span>
+                        <button class="toolbar-btn" title="表格"><i class="el-icon-date"></i></button>
+                        <button class="toolbar-btn" title="日期"><i class="el-icon-time"></i></button>
+                        <button class="toolbar-btn" title="特殊字符"><i class="el-icon-goods"></i></button>
+                      </div>
+                    </div>
+                    <textarea 
+                      v-model="formData.description" 
+                      class="rich-text-editor" 
+                      :style="{ fontSize: editorFontSize + 'px' }" 
+                      placeholder="请输入商品详情内容..." 
+                      maxlength="10000"
+                    ></textarea>
+                    <div class="editor-footer">
+                      <span class="element-path">元素路径: body {'>'} p {'>'} br</span>
+                      <span class="word-count">0 / 10000</span>
+                    </div>
+                  </div>
                 </div>
-                <div class="preview-info">
-                  <h4>{{ formData.title || '未设置商品标题' }}</h4>
-                  <div class="preview-row">
-                    <span class="preview-label">兑换积分：</span>
-                    <span class="preview-value integral">{{ formData.integral }} 积分</span>
-                  </div>
-                  <div class="preview-row">
-                    <span class="preview-label">库存：</span>
-                    <span class="preview-value">{{ formData.stock }}</span>
-                  </div>
-                  <div class="preview-row">
-                    <span class="preview-label">限购：</span>
-                    <span class="preview-value">
-                      每用户最多兑换{{ formData.exchangeLimit === 0 ? '不限' : formData.exchangeLimit }}件，
-                      单笔最多兑换{{ formData.maxExchange === 0 ? '不限' : formData.maxExchange }}件
-                    </span>
-                  </div>
-                  <div class="preview-row">
-                    <span class="preview-label">等级限制：</span>
-                    <span class="preview-value">{{ formData.levelLimit === 0 ? '不限制' : '等级' + formData.levelLimit }}</span>
-                  </div>
-                  <div class="preview-row">
-                    <span class="preview-label">上架状态：</span>
-                    <span :class="['preview-value', formData.status === 1 ? 'status-online' : 'status-offline']">
-                      {{ formData.status === 1 ? '上架' : '下架' }}
-                    </span>
+                <div class="detail-right">
+                  <div class="phone-frame">
+                    <div class="phone-header">
+                      <div class="phone-notch"></div>
+                    </div>
+                    <div class="phone-screen">
+                      <div class="preview-header">详情预览</div>
+                      <div class="preview-content" v-html="formData.description || '<div class=empty-content>暂无内容</div>'"></div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </el-card>
+            </el-tab-pane>
+          </el-tabs>
         </div>
       </div>
 
@@ -422,6 +533,10 @@ export default {
       selectedProductId: null,
       selectedProducts: [],
       editorFontSize: 14,
+      detailTab: 'detail',
+      paragraphFormat: '',
+      blockFormat: 'p',
+      fontFamily: '',
       formData: {
         mainImage: '',
         carouselImages: [],
@@ -857,64 +972,242 @@ export default {
 }
 
 .step3-content {
-  .editor-wrapper {
-    display: flex;
-    gap: 20px;
+  .detail-tabs {
+    ::v-deep .el-tabs__header {
+      margin: 0;
+    }
 
+    ::v-deep .el-tabs__content {
+      padding: 20px 0;
+    }
+  }
+
+  .basic-info-content {
     .el-form-item {
-      flex: 1;
-      margin-right: 0;
+      margin-bottom: 22px;
+    }
+
+    .image-upload-area {
+      .image-tip {
+        font-size: 12px;
+        color: #909399;
+        margin-top: 8px;
+      }
+    }
+
+    .image-upload-card {
+      width: 100px;
+      height: 100px;
+      border: 2px dashed #dcdfe6;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      i {
+        font-size: 24px;
+        color: #c0c4cc;
+      }
+
+      &:hover {
+        border-color: #409eff;
+        color: #409eff;
+      }
+    }
+
+    .image-list {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+
+      .carousel-image-item {
+        position: relative;
+        width: 100px;
+        height: 100px;
+        border-radius: 8px;
+        overflow: hidden;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+
+        i {
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          width: 20px;
+          height: 20px;
+          background: rgba(0, 0, 0, 0.5);
+          color: #fff;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+
+          &:hover {
+            background: rgba(245, 108, 108, 0.8);
+          }
+        }
+      }
+
+      .carousel-add-btn {
+        width: 100px;
+        height: 100px;
+        border: 2px dashed #dcdfe6;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: #c0c4cc;
+
+        i {
+          font-size: 24px;
+        }
+
+        &:hover {
+          border-color: #409eff;
+          color: #409eff;
+        }
+      }
+    }
+
+    .integral-input-wrap {
+      display: flex;
+      align-items: center;
+
+      .input-suffix {
+        margin-left: 8px;
+        color: #606266;
+      }
+    }
+
+    .limit-input-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #606266;
+
+      .limit-input {
+        width: 80px;
+      }
+
+      .limit-divider {
+        color: #c0c4cc;
+      }
+    }
+
+    .form-tip {
+      font-size: 12px;
+      color: #909399;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+  }
+
+  .detail-content-wrapper {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+  }
+
+  .detail-left {
+    flex: 1;
+    min-width: 0;
+
+    .detail-label {
+      font-size: 14px;
+      color: #606266;
+      margin-bottom: 8px;
     }
 
     .editor-container {
       display: flex;
       flex-direction: column;
-      height: 500px;
+      height: 560px;
       border: 1px solid #dcdfe6;
       border-radius: 4px;
       overflow: hidden;
 
       .editor-toolbar {
-        display: flex;
-        align-items: center;
-        padding: 8px 16px;
         background: #f5f7fa;
         border-bottom: 1px solid #e4e7ed;
 
-        .toolbar-item {
-          font-size: 14px;
-          color: #606266;
-          margin-right: 8px;
-        }
-
-        .font-size-select {
-          width: 80px;
-          margin-right: 16px;
-        }
-
-        .toolbar-divider {
-          width: 1px;
-          height: 18px;
-          background: #dcdfe6;
-          margin: 0 12px;
-        }
-
-        .toolbar-btn {
-          width: 32px;
-          height: 32px;
+        .toolbar-row {
           display: flex;
           align-items: center;
-          justify-content: center;
-          border: none;
-          background: transparent;
-          cursor: pointer;
-          border-radius: 4px;
-          margin-right: 4px;
-          color: #606266;
+          padding: 6px 12px;
+          border-bottom: 1px solid #e4e7ed;
 
-          &:hover {
-            background: #e8f4fd;
-            color: #409eff;
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .toolbar-select {
+            margin-right: 8px;
+
+            ::v-deep .el-input__inner {
+              height: 28px;
+              line-height: 28px;
+              font-size: 12px;
+            }
+          }
+
+          .toolbar-divider {
+            width: 1px;
+            height: 20px;
+            background: #dcdfe6;
+            margin: 0 8px;
+          }
+
+          .toolbar-btn {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            border-radius: 3px;
+            margin-right: 2px;
+            color: #606266;
+            font-size: 14px;
+            position: relative;
+
+            b, i, u, s {
+              font-size: 13px;
+              font-weight: normal;
+            }
+
+            sub, sup {
+              font-size: 10px;
+            }
+
+            .btn-underline {
+              position: absolute;
+              bottom: 3px;
+              left: 4px;
+              right: 4px;
+              height: 3px;
+              background: #f56c6c;
+            }
+
+            &:hover {
+              background: #e8f4fd;
+              color: #409eff;
+            }
           }
         }
       }
@@ -934,7 +1227,7 @@ export default {
       .editor-footer {
         display: flex;
         justify-content: space-between;
-        padding: 8px 16px;
+        padding: 6px 12px;
         background: #f5f7fa;
         border-top: 1px solid #e4e7ed;
 
@@ -949,158 +1242,64 @@ export default {
         }
       }
     }
-
-    .mobile-preview {
-      width: 320px;
-      flex-shrink: 0;
-
-      .phone-frame {
-        width: 100%;
-        background: #1a1a1a;
-        border-radius: 36px;
-        padding: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-
-        .phone-header {
-          height: 44px;
-          display: flex;
-          justify-content: center;
-          align-items: flex-start;
-
-          .phone-notch {
-            width: 160px;
-            height: 28px;
-            background: #1a1a1a;
-            border-radius: 0 0 16px 16px;
-            position: relative;
-            top: -2px;
-          }
-        }
-
-        .phone-screen {
-          background: #fff;
-          border-radius: 24px;
-          padding: 16px;
-          min-height: 480px;
-          max-height: 500px;
-          overflow-y: auto;
-
-          .preview-header {
-            text-align: center;
-            font-size: 16px;
-            font-weight: bold;
-            color: #303133;
-            margin-bottom: 12px;
-          }
-
-          .preview-divider {
-            height: 1px;
-            background: #ebeef5;
-            margin-bottom: 16px;
-          }
-
-          .preview-content {
-            font-size: 14px;
-            color: #606266;
-            line-height: 1.8;
-            white-space: pre-wrap;
-            word-break: break-all;
-
-            .empty-content {
-              text-align: center;
-              color: #c0c4cc;
-              padding: 40px 0;
-            }
-          }
-        }
-      }
-    }
   }
 
-  .config-preview-card {
-    margin-top: 24px;
-    padding: 20px;
-    background: #fafafa;
-    border-radius: 8px;
+  .detail-right {
+    width: 320px;
+    flex-shrink: 0;
 
-    .preview-title {
-      font-size: 16px;
-      font-weight: bold;
-      color: #303133;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #ebeef5;
-    }
+    .phone-frame {
+      width: 100%;
+      background: #1a1a1a;
+      border-radius: 36px;
+      padding: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 
-    .preview-content {
-      .preview-product {
+      .phone-header {
+        height: 36px;
         display: flex;
-        gap: 20px;
+        justify-content: center;
+        align-items: flex-start;
 
-        .preview-image {
-          width: 160px;
-          height: 160px;
-          border-radius: 8px;
-          overflow: hidden;
-          background: #fff;
-          border: 1px solid #ebeef5;
+        .phone-notch {
+          width: 140px;
+          height: 24px;
+          background: #1a1a1a;
+          border-radius: 0 0 14px 14px;
+          position: relative;
+          top: -2px;
+        }
+      }
 
-          img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-          }
+      .phone-screen {
+        background: #fff;
+        border-radius: 22px;
+        min-height: 480px;
+        max-height: 500px;
+        overflow-y: auto;
 
-          .no-image {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #909399;
-            font-size: 14px;
-          }
+        .preview-header {
+          text-align: center;
+          font-size: 14px;
+          color: #606266;
+          padding: 12px 0;
+          background: #f8f9fa;
+          border-radius: 22px 22px 0 0;
         }
 
-        .preview-info {
-          flex: 1;
+        .preview-content {
+          padding: 16px;
+          font-size: 14px;
+          color: #606266;
+          line-height: 1.8;
+          white-space: pre-wrap;
+          word-break: break-all;
 
-          h4 {
-            font-size: 16px;
-            font-weight: bold;
-            color: #303133;
-            margin-bottom: 16px;
-            line-height: 1.5;
-          }
-
-          .preview-row {
-            display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-
-            .preview-label {
-              width: 100px;
-              font-size: 14px;
-              color: #606266;
-            }
-
-            .preview-value {
-              font-size: 14px;
-              color: #303133;
-
-              &.integral {
-                color: #409eff;
-                font-weight: bold;
-              }
-
-              &.status-online {
-                color: #67c23a;
-              }
-
-              &.status-offline {
-                color: #909399;
-              }
-            }
+          .empty-content {
+            text-align: center;
+            color: #c0c4cc;
+            padding: 60px 0;
+            font-size: 14px;
           }
         }
       }
