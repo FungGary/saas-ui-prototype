@@ -18,18 +18,14 @@
               row-key="userNo"
               :search-fields="['nickname', 'uid', 'userNo']"
             />
-          <annotation-point
-            title="【优化】用户信息筛选交互"
-            content="优化前：用户信息使用普通输入或下拉选择，数据量较大时查找效率低，且容易只看到单一字段。&#10;&#10;优化后：改为带搜索图标的只读输入框，点击输入框或搜索图标打开用户搜索弹窗，支持按昵称、UID、用户编号、手机号等信息检索，选择后回填筛选区。&#10;&#10;原因：用户数据量大，弹窗表格可以同时展示头像、昵称、编号等关键信息，降低误选并提升筛选效率。"
-            priority="P1"
-          />
           </el-form-item>
-          <el-form-item label="时间类型：">
-            <el-select clearable v-model="filterForm.timeType" placeholder="请选择" class="form-content-width">
-              <el-option v-for="(item, index) in timeTypeOptions" :key="index" :label="item.label" :value="item.value"></el-option>
-            </el-select>
+          <el-form-item label="内部订单号：">
+            <el-input clearable v-model="filterForm.internalOrderNo" placeholder="请输入内部订单号" class="form-content-width" />
           </el-form-item>
-          <el-form-item label="时间范围：">
+          <el-form-item label="外部订单号：">
+            <el-input clearable v-model="filterForm.externalOrderNo" placeholder="请输入内部订单号" class="form-content-width" />
+          </el-form-item>
+          <el-form-item label="支付时间：">
             <el-date-picker
               clearable
               v-model="filterForm.timeRange"
@@ -37,69 +33,46 @@
               :editable="false"
               format="yyyy/MM/dd"
               value-format="yyyy/MM/dd"
-              start-placeholder="开始日期"
-              end-placeholder="结束日期"
+              start-placeholder="开始时间"
+              end-placeholder="结束时间"
               :picker-options="pickerOptions"
               style="width: 250px"
             ></el-date-picker>
-          </el-form-item>
-          <el-form-item label="内部订单号：">
-            <el-input clearable v-model="filterForm.internalOrderNo" placeholder="请输入内部订单号" class="form-content-width" />
-          </el-form-item>
-
-          <!-- 第二行筛选 -->
-          <el-form-item label="外部订单号：">
-            <annotation-point
-              title="【新增】外部订单号筛选"
-              content="优化前：没有外部订单号筛选，无法通过第三方支付订单号快速查找充值记录。&#10;&#10;优化后：新增外部订单号输入框，支持模糊搜索，提示为'微信/支付宝/三方支付订单号'。&#10;&#10;功能说明：外部订单号是第三方支付（微信、支付宝、汇付、宝付）生成的订单号，用于与第三方系统对账和问题排查。&#10;&#10;业务说明：当用户反馈充值未到账时，可通过用户提供的第三方支付订单号快速定位充值记录。"
-              priority="P1"
-            />
-            <el-input clearable v-model="filterForm.externalOrderNo" placeholder="微信/支付宝/三方支付订单号" class="form-content-width" />
-          </el-form-item>
-          <el-form-item label="订单状态：">
-            <el-select clearable v-model="filterForm.orderStatus" placeholder="请选择" class="form-content-width">
-              <el-option v-for="(item, index) in orderStatusOptions" :key="index" :label="item.label" :value="item.value"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="退款状态：">
-            <annotation-point
-              title="【新增】退款状态筛选"
-              content="优化前：没有退款状态筛选条件。&#10;&#10;优化后：新增退款状态下拉选择框。&#10;&#10;功能说明：用于筛选不同退款状态的充值订单，选项包括：全部、待退款、退款中、退款成功、退款失败、已取消。&#10;&#10;业务说明：待退款状态的订单需要运营人员处理退款操作。"
-              priority="P1"
-            />
-            <el-select clearable v-model="filterForm.refundStatus" placeholder="请选择" class="form-content-width">
-              <el-option v-for="(item, index) in refundStatusOptions" :key="index" :label="item.label" :value="item.value"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="支付类型：">
-            <annotation-point
-              title="【新增】支付类型筛选"
-              content="优化前：没有支付类型筛选条件。&#10;&#10;优化后：新增支付类型筛选下拉框。&#10;&#10;功能说明：通过支付类型筛选充值记录，选项包括：宝付支付宝支付、宝付微信支付、汇付支付宝支付、汇付微信支付。&#10;&#10;业务说明：宝付、汇付为不同支付服务商，各支持支付宝和微信两种支付方式。"
-              priority="P1"
-            />
-            <el-select clearable v-model="filterForm.payMethod" placeholder="请选择" class="form-content-width">
-              <el-option v-for="(item, index) in payMethodOptions" :key="index" :label="item.label" :value="item.value"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="订单来源：">
-            <el-select clearable v-model="filterForm.orderSource" placeholder="请选择" class="form-content-width">
-              <el-option v-for="(item, index) in orderSourceOptions" :key="index" :label="item.label" :value="item.value"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="汇付商户号：">
-            <annotation-point
-              title="【新增】汇付商户号筛选"
-              content="优化前：没有汇付商户号筛选，无法按商户维度查看充值记录。&#10;&#10;优化后：新增汇付商户号输入框，支持模糊搜索。&#10;&#10;功能说明：汇付商户号是汇付支付渠道分配的商户编号，用于区分不同商户的充值流水。&#10;&#10;业务说明：多商户场景下，可按汇付商户号筛选特定商户的充值订单，便于商户对账。"
-              priority="P2"
-            />
-            <el-input clearable v-model="filterForm.huifuMerchantNo" placeholder="请输入汇付商户号" class="form-content-width" />
           </el-form-item>
 
           <!-- 操作按钮 -->
           <el-form-item class="filter-buttons">
             <el-button v-db-click @click="handleReset">重置</el-button>
             <el-button type="primary" v-db-click @click="handleSearch">查询</el-button>
+            <el-button type="text" v-db-click @click="toggleFilterCollapse">
+              <i :class="filterCollapsed ? 'el-icon-arrow-down' : 'el-icon-arrow-up'"></i>
+              {{ filterCollapsed ? '展开' : '收起' }}
+            </el-button>
           </el-form-item>
+
+          <!-- 第二行筛选 -->
+          <template v-if="!filterCollapsed">
+            <el-form-item label="支付状态：">
+              <el-select clearable v-model="filterForm.orderStatus" placeholder="全部" class="form-content-width">
+                <el-option v-for="(item, index) in orderStatusOptions" :key="index" :label="item.label" :value="item.value"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="退款状态：">
+              <el-select clearable v-model="filterForm.refundStatus" placeholder="全部" class="form-content-width">
+                <el-option v-for="(item, index) in refundStatusOptions" :key="index" :label="item.label" :value="item.value"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="支付类型：">
+              <el-select clearable v-model="filterForm.payMethod" placeholder="全部" class="form-content-width">
+                <el-option v-for="(item, index) in payMethodOptions" :key="index" :label="item.label" :value="item.value"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="订单来源：">
+              <el-select clearable v-model="filterForm.orderSource" placeholder="全部" class="form-content-width">
+                <el-option v-for="(item, index) in orderSourceOptions" :key="index" :label="item.label" :value="item.value"></el-option>
+              </el-select>
+            </el-form-item>
+          </template>
         </el-form>
       </div>
     </el-card>
@@ -126,8 +99,7 @@
           priority="P2"
         />
         <div class="stat-label">{{ card.label }}</div>
-        <div class="stat-value" :class="card.valueClass">{{ card.prefix }}{{ card.value }}{{ card.suffix }}</div>
-        <div class="stat-tip">{{ card.tip }}</div>
+        <div class="stat-value" :class="card.valueClass">{{ card.value }}</div>
       </div>
     </div>
 
@@ -135,12 +107,10 @@
     <el-card :bordered="false" shadow="never" class="mt16" :body-style="{ padding: '0 20px 20px' }">
       <div class="table-toolbar">
         <div class="toolbar-left">
-          <el-button v-db-click @click="handleExport">
-            <i class="el-icon-download"></i> 导出
-          </el-button>
+          <span class="table-title">充值记录</span>
         </div>
         <div class="toolbar-right">
-          <span class="table-result-count">共 {{ pagination.total }} 条</span>
+          <el-button size="small" v-db-click @click="handleExport">导出</el-button>
         </div>
       </div>
 
@@ -248,21 +218,6 @@
           </template>
         </el-table-column>
 
-        <!-- 汇付商户号 -->
-        <el-table-column label="汇付商户号" min-width="140">
-          <template slot="header">
-            <span>汇付商户号</span>
-            <annotation-point
-              title="【新增】汇付商户号列"
-              content="优化前：没有汇付商户号列，无法查看订单所属的汇付商户。&#10;&#10;优化后：新增'汇付商户号'列，显示汇付支付渠道分配的商户编号。&#10;&#10;功能说明：展示汇付商户编号，用于区分不同商户的充值流水。&#10;&#10;业务说明：多商户场景下，不同商户有不同商户号，便于商户对账和区分订单归属。&#10;&#10;逻辑说明：仅汇付渠道订单有商户号，非汇付渠道（宝付）显示'-'。&#10;&#10;状态说明：有商户号时显示，无则显示'-'。"
-              priority="P2"
-            />
-          </template>
-          <template slot-scope="{ row }">
-            <span>{{ row.huifuMerchantNo || '-' }}</span>
-          </template>
-        </el-table-column>
-
         <!-- 支付时间 -->
         <el-table-column label="支付时间" min-width="160">
           <template slot-scope="{ row }">
@@ -270,57 +225,29 @@
           </template>
         </el-table-column>
 
-        <!-- 创建时间 -->
-        <el-table-column label="创建时间" min-width="160">
-          <template slot="header">
-            <span>创建时间</span>
-            <annotation-point
-              title="【新增】创建时间列"
-              content="优化前：表格中没有创建时间列，只能通过支付时间判断订单时间。&#10;&#10;优化后：新增'创建时间'列，显示充值订单创建的时间。&#10;&#10;功能说明：展示订单创建的时间，便于追踪订单全生命周期。&#10;&#10;业务说明：订单创建时间与支付时间可能不同（用户创建订单后未立即支付），创建时间用于判断用户下单行为。&#10;&#10;逻辑说明：所有订单都显示创建时间，格式为yyyy-MM-dd HH:mm:ss。&#10;&#10;状态说明：必显示，无空状态。"
-              priority="P2"
-            />
-          </template>
-          <template slot-scope="{ row }">
-            <span>{{ row.createTime }}</span>
-          </template>
-        </el-table-column>
-
         <!-- 支付状态列 -->
         <el-table-column label="支付状态" width="100" align="center">
           <template slot-scope="{ row }">
-            <el-tag size="small" :type="getOrderStatusTagType(row.orderStatus)">{{ getOrderStatusText(row.orderStatus) }}</el-tag>
+            <span :class="['status-text', row.orderStatus === 'paid' ? 'status-paid' : 'status-unpaid']">{{ getOrderStatusText(row.orderStatus) }}</span>
           </template>
         </el-table-column>
 
         <!-- 退款状态列 -->
         <el-table-column label="退款状态" width="100" align="center">
-          <template slot="header">
-            <span>退款状态</span>
-            <annotation-point
-              title="【优化】退款状态统一为5种"
-              content="优化前：退款状态为3种，与退款记录页面不一致。&#10;&#10;优化后：统一为5种退款状态，与退款记录页面保持一致。&#10;&#10;状态说明：&#10;- 待退款：用户提交退款申请，等待运营审核，黄色标签&#10;- 退款中：审核通过，退款处理中，蓝色标签&#10;- 退款成功：退款已完成，绿色标签&#10;- 退款失败：退款处理失败，红色标签&#10;- 已取消：审核拒绝或用户取消，灰色标签&#10;&#10;业务说明：状态流转为待退款、退款中、退款成功或退款失败；审核拒绝或用户取消后为已取消。"
-              priority="P1"
-            />
-          </template>
           <template slot-scope="{ row }">
-            <el-tag size="small" :type="getRefundStatusTagType(row.refundStatus)">{{ getRefundStatusText(row.refundStatus) }}</el-tag>
+            <span v-if="row.refundStatus === 'none'" class="status-text status-none">-</span>
+            <span v-else :class="['status-text', row.refundStatus === 'pending' ? 'status-pending' : row.refundStatus === 'success' ? 'status-refunded' : '']">{{ getRefundStatusText(row.refundStatus) }}</span>
           </template>
         </el-table-column>
 
         <!-- 操作列 -->
-        <el-table-column label="操作" fixed="right" width="160">
-          <template slot="header">
-            <span>操作</span>
-            <annotation-point
-              title="【优化】操作列改为详情+退款"
-              content="优化前：操作列有详情、审核、重试等多种操作，较复杂。&#10;&#10;优化后：操作列简化为详情和退款两个操作。&#10;&#10;业务逻辑：&#10;- 详情：所有订单都可查看详情&#10;- 退款：仅已支付且处于待退款状态的订单可操作，点击后弹出退款确认弹窗。"
-              priority="P1"
-            />
-          </template>
+        <el-table-column label="操作" fixed="right" width="120" align="center">
           <template slot-scope="{ row }">
-            <a v-db-click @click="handleDetail(row)">详情</a>
-            <el-divider v-if="row.orderStatus === 'paid' && row.refundStatus === 'pending'" direction="vertical" />
-            <a v-if="row.orderStatus === 'paid' && row.refundStatus === 'pending'" v-db-click @click="handleRefund(row)">退款</a>
+            <a class="action-link" v-db-click @click="handleDetail(row)">详情</a>
+            <template v-if="row.orderStatus === 'paid' && row.refundStatus === 'pending'">
+              <span class="action-divider">|</span>
+              <a class="action-link" v-db-click @click="handleRefund(row)">退款</a>
+            </template>
           </template>
         </el-table-column>
       </el-table>
@@ -539,11 +466,11 @@ export default {
 
       // 统计卡片（5个）
       statCards: [
-        { key: 'totalRechargeAmount', label: '充值总金额', value: '0.00', prefix: '¥', suffix: '', tip: '仅统计已支付充值订单金额', valueClass: '' },
-        { key: 'actualPayAmount', label: '实付金额', value: '0.00', prefix: '¥', suffix: '', tip: '充值金额 - 随机立减/优惠金额', valueClass: '' },
-        { key: 'refundAmount', label: '充值退款金额', value: '0.00', prefix: '¥', suffix: '', tip: '仅统计已全额退款订单金额', valueClass: 'refund' },
-        { key: 'alipayAmount', label: '支付宝充值金额', value: '0.00', prefix: '¥', suffix: '', tip: '支付宝支付订单的实付金额', valueClass: '' },
-        { key: 'wechatAmount', label: '微信充值金额', value: '0.00', prefix: '¥', suffix: '', tip: '微信支付订单的实付金额', valueClass: '' },
+        { key: 'totalRechargeAmount', label: '充值总金额', value: '775.00', prefix: '', suffix: '', tip: '', valueClass: '' },
+        { key: 'actualPayAmount', label: '实付金额', value: '755.00', prefix: '', suffix: '', tip: '', valueClass: '' },
+        { key: 'refundAmount', label: '充值退款金额', value: '50.00', prefix: '', suffix: '', tip: '', valueClass: 'refund' },
+        { key: 'alipayAmount', label: '支付宝充值金额', value: '150.00', prefix: '', suffix: '', tip: '', valueClass: '' },
+        { key: 'wechatAmount', label: '微信充值金额', value: '625.00', prefix: '', suffix: '', tip: '', valueClass: '' },
       ],
 
       // 表格数据
@@ -555,7 +482,7 @@ export default {
       pagination: {
         page: 1,
         pageSize: 10,
-        total: 0,
+        total: 278,
       },
       userPickerColumns: [
         { label: '头像', prop: 'avatar', type: 'avatar', fallbackProp: 'nickname', width: 90 },
@@ -574,6 +501,9 @@ export default {
       // 退款确认弹窗
       refundDialogVisible: false,
       refundTarget: null,
+
+      // 筛选收起状态
+      filterCollapsed: false,
 
       // 选项数据
       timeTypeOptions: [
@@ -659,8 +589,8 @@ export default {
       return [
         {
           id: 1,
-          internalOrderNo: 'CZ202606260001',
-          externalOrderNo: 'WX4200001980632',
+          internalOrderNo: 'CZ202...35584',
+          externalOrderNo: 'HF202...35584',
           orderStatus: 'paid',
           refundStatus: 'pending',
           createTime: '2026-06-26 10:20:30',
@@ -676,7 +606,7 @@ export default {
           refundAmount: 0,
           payMethod: 'huifu_weixin',
           orderSource: 'h5',
-          huifuMerchantNo: 'HF20260001',
+          huifuMerchantNo: '',
           internalRefundNo: '',
           externalRefundNo: '',
           refundApplyTime: '',
@@ -684,12 +614,12 @@ export default {
         },
         {
           id: 2,
-          internalOrderNo: 'CZ202606260002',
-          externalOrderNo: 'ALI4200001980633',
+          internalOrderNo: 'CZ202...35585',
+          externalOrderNo: 'BF203...35585',
           orderStatus: 'paid',
           refundStatus: 'success',
           createTime: '2026-06-26 09:15:00',
-          payTime: '2026-06-26 09:16:30',
+          payTime: '2026-06-26 10:24:30',
           refundTime: '2026-06-26 11:30:20',
           avatar: '',
           nickname: '熊猫咪',
@@ -709,19 +639,19 @@ export default {
         },
         {
           id: 3,
-          internalOrderNo: 'CZ202606260003',
-          externalOrderNo: '',
+          internalOrderNo: 'CZ202...35586',
+          externalOrderNo: 'CZ204...35586',
           orderStatus: 'unpaid',
-          refundStatus: 'cancelled',
+          refundStatus: 'none',
           createTime: '2026-06-26 11:30:00',
           payTime: '',
           refundTime: '',
           avatar: '',
-          nickname: '老虎仔',
+          nickname: '小虎仔',
           uid: 102,
           userNo: '5916955598',
-          orderAmount: 30.00,
-          randomDiscount: 0.00,
+          orderAmount: 75.00,
+          randomDiscount: 1.00,
           payAmount: 0,
           refundAmount: 0,
           payMethod: '',
@@ -734,49 +664,49 @@ export default {
         },
         {
           id: 4,
-          internalOrderNo: 'CZ202606260004',
-          externalOrderNo: 'WX4200001980634',
-          orderStatus: 'paid',
-          refundStatus: 'pending',
-          createTime: '2026-06-26 08:00:00',
-          payTime: '2026-06-26 08:05:00',
+          internalOrderNo: 'CZ202...35587',
+          externalOrderNo: 'CZ205...35587',
+          orderStatus: 'unpaid',
+          refundStatus: 'none',
+          createTime: '2026-06-26 13:02:47',
+          payTime: '',
           refundTime: '',
           avatar: '',
-          nickname: '狐狸姐姐',
+          nickname: '蓝天',
           uid: 103,
           userNo: '5916955599',
-          orderAmount: 198.00,
-          randomDiscount: 0.00,
-          payAmount: 198.00,
+          orderAmount: 100.00,
+          randomDiscount: 2.00,
+          payAmount: 0,
           refundAmount: 0,
-          payMethod: 'huifu_weixin',
+          payMethod: 'huifu_alipay',
           orderSource: 'wechat_public',
           huifuMerchantNo: '',
           internalRefundNo: '',
           externalRefundNo: '',
-          refundApplyTime: '2026-06-27 09:00:00',
-          refundReason: '充值未到账，申请退款',
+          refundApplyTime: '',
+          refundReason: '',
         },
         {
           id: 5,
-          internalOrderNo: 'CZ202606260005',
-          externalOrderNo: 'WX4200001980635',
+          internalOrderNo: 'CZ202...35588',
+          externalOrderNo: 'CZ206...35588',
           orderStatus: 'paid',
           refundStatus: 'pending',
           createTime: '2026-06-26 14:00:00',
-          payTime: '2026-06-26 14:01:00',
+          payTime: '2026-06-26 14:18:03',
           refundTime: '',
           avatar: '',
-          nickname: '兔子乖乖',
+          nickname: '花栗鼠',
           uid: 104,
           userNo: '5916955600',
-          orderAmount: 100.00,
-          randomDiscount: 2.00,
-          payAmount: 98.00,
+          orderAmount: 125.00,
+          randomDiscount: 3.00,
+          payAmount: 122.00,
           refundAmount: 0,
-          payMethod: 'huifu_weixin',
-          orderSource: 'h5',
-          huifuMerchantNo: 'HF20260002',
+          payMethod: 'baofu_weixin',
+          orderSource: 'miniapp',
+          huifuMerchantNo: '',
           internalRefundNo: '',
           externalRefundNo: '',
           refundApplyTime: '',
@@ -784,23 +714,23 @@ export default {
         },
         {
           id: 6,
-          internalOrderNo: 'CZ202606260006',
-          externalOrderNo: 'ALI4200001980636',
-          orderStatus: 'unpaid',
-          refundStatus: 'cancelled',
-          createTime: '2026-06-26 16:00:00',
-          payTime: '',
+          internalOrderNo: 'CZ202...77344',
+          externalOrderNo: 'CZ207...35589',
+          orderStatus: 'paid',
+          refundStatus: 'pending',
+          createTime: '2026-06-26 15:00:00',
+          payTime: '2026-06-26 15:37:59',
           refundTime: '',
           avatar: '',
-          nickname: '小黄鸭',
+          nickname: '月光',
           uid: 105,
           userNo: '5916955601',
-          orderAmount: 200.00,
-          randomDiscount: 10.00,
-          payAmount: 0,
+          orderAmount: 150.00,
+          randomDiscount: 4.00,
+          payAmount: 146.00,
           refundAmount: 0,
-          payMethod: '',
-          orderSource: 'admin',
+          payMethod: 'baofu_weixin',
+          orderSource: 'miniapp',
           huifuMerchantNo: '',
           internalRefundNo: '',
           externalRefundNo: '',
@@ -809,103 +739,28 @@ export default {
         },
         {
           id: 7,
-          internalOrderNo: 'CZ202606260007',
-          externalOrderNo: 'WX4200001980637',
+          internalOrderNo: 'CZ202...60927',
+          externalOrderNo: 'CZ208...35590',
           orderStatus: 'paid',
-          refundStatus: 'processing',
-          createTime: '2026-06-27 10:00:00',
-          payTime: '2026-06-27 10:05:00',
+          refundStatus: 'pending',
+          createTime: '2026-06-26 16:00:00',
+          payTime: '2026-06-26 16:50:44',
           refundTime: '',
           avatar: '',
-          nickname: '星星糖',
+          nickname: '雪狐',
           uid: 106,
           userNo: '5916955602',
-          orderAmount: 150.00,
-          randomDiscount: 0.00,
-          payAmount: 150.00,
+          orderAmount: 175.00,
+          randomDiscount: 5.00,
+          payAmount: 170.00,
           refundAmount: 0,
-          payMethod: 'huifu_alipay',
-          orderSource: 'app',
-          huifuMerchantNo: 'HF20260001',
-          internalRefundNo: 'TK202606260002',
-          externalRefundNo: '',
-          refundApplyTime: '2026-06-27 11:00:00',
-          refundReason: '投币未使用，申请退还',
-        },
-        {
-          id: 8,
-          internalOrderNo: 'CZ202606260008',
-          externalOrderNo: 'ALI4200001980638',
-          orderStatus: 'paid',
-          refundStatus: 'failed',
-          createTime: '2026-06-25 08:00:00',
-          payTime: '2026-06-25 08:05:00',
-          refundTime: '2026-06-25 09:30:00',
-          avatar: '',
-          nickname: '云朵朵',
-          uid: 107,
-          userNo: '5916955603',
-          orderAmount: 80.00,
-          randomDiscount: 0.00,
-          payAmount: 80.00,
-          refundAmount: 0,
-          payMethod: 'baofu_alipay',
+          payMethod: 'baofu_weixin',
           orderSource: 'miniapp',
           huifuMerchantNo: '',
-          internalRefundNo: 'TK202606260003',
+          internalRefundNo: '',
           externalRefundNo: '',
-          refundApplyTime: '2026-06-25 09:00:00',
-          refundReason: '退款金额超出支付金额范围',
-        },
-        {
-          id: 9,
-          internalOrderNo: 'CZ202606260009',
-          externalOrderNo: 'WX4200001980639',
-          orderStatus: 'paid',
-          refundStatus: 'cancelled',
-          createTime: '2026-06-24 12:00:00',
-          payTime: '2026-06-24 12:05:00',
-          refundTime: '2026-06-24 14:00:00',
-          avatar: '',
-          nickname: '月光宝盒',
-          uid: 108,
-          userNo: '5916955604',
-          orderAmount: 300.00,
-          randomDiscount: 10.00,
-          payAmount: 290.00,
-          refundAmount: 0,
-          payMethod: 'huifu_weixin',
-          orderSource: 'h5',
-          huifuMerchantNo: 'HF20260003',
-          internalRefundNo: 'TK202606260004',
-          externalRefundNo: '',
-          refundApplyTime: '2026-06-24 13:00:00',
-          refundReason: '审核拒绝：不符合退款条件',
-        },
-        {
-          id: 10,
-          internalOrderNo: 'CZ202606260010',
-          externalOrderNo: 'ALI4200001980640',
-          orderStatus: 'paid',
-          refundStatus: 'success',
-          createTime: '2026-06-23 15:00:00',
-          payTime: '2026-06-23 15:02:00',
-          refundTime: '2026-06-23 16:00:00',
-          avatar: '',
-          nickname: '七彩泡泡',
-          uid: 109,
-          userNo: '5916955605',
-          orderAmount: 258.00,
-          randomDiscount: 8.00,
-          payAmount: 250.00,
-          refundAmount: 250.00,
-          payMethod: 'huifu_alipay',
-          orderSource: 'wechat_public',
-          huifuMerchantNo: 'HF20260002',
-          internalRefundNo: 'TK202606260005',
-          externalRefundNo: 'ALIR202606260001',
-          refundApplyTime: '2026-06-23 15:30:00',
-          refundReason: '七天无理由退换',
+          refundApplyTime: '',
+          refundReason: '',
         },
       ];
     },
@@ -972,12 +827,16 @@ export default {
       }
 
       this.filteredData = data;
-      this.pagination.total = data.length;
+      // this.pagination.total = data.length;
       this.pagination.page = 1;
       this.updateStatCards();
       setTimeout(() => {
         this.loading = false;
       }, 200);
+    },
+
+    toggleFilterCollapse() {
+      this.filterCollapsed = !this.filterCollapsed;
     },
 
     handleReset() {
@@ -1148,11 +1007,11 @@ export default {
       return map[status] || '';
     },
     getRefundStatusText(status) {
-      const map = { pending: '待退款', processing: '退款中', success: '退款成功', failed: '退款失败', cancelled: '已取消' };
+      const map = { none: '-', pending: '待退款', processing: '退款中', success: '已退款', failed: '退款失败', cancelled: '已取消' };
       return map[status] || status;
     },
     getRefundStatusTagType(status) {
-      const map = { pending: 'warning', processing: 'primary', success: 'success', failed: 'danger', cancelled: 'info' };
+      const map = { none: 'info', pending: 'primary', processing: 'primary', success: 'info', failed: 'danger', cancelled: 'info' };
       return map[status] || 'info';
     },
     getPayMethodText(method) {
@@ -1256,7 +1115,7 @@ export default {
 
 .stat-card {
   flex: 1;
-  min-width: 180px;
+  min-width: 160px;
   background: #fff;
   border-radius: 4px;
   border: 1px solid #ebeef5;
@@ -1265,16 +1124,15 @@ export default {
 
 .stat-label {
   font-size: 14px;
-  color: #909399;
-  margin-bottom: 8px;
+  color: #606266;
+  margin-bottom: 12px;
 }
 
 .stat-value {
-  font-size: 24px;
-  font-weight: 600;
+  font-size: 28px;
+  font-weight: 500;
   color: #303133;
   line-height: 1.2;
-  margin-bottom: 4px;
   word-break: break-all;
 
   &.refund {
@@ -1282,18 +1140,12 @@ export default {
   }
 }
 
-.stat-tip {
-  font-size: 12px;
-  color: #c0c4cc;
-  line-height: 1.45;
-}
-
 /* ========== 表格区 ========== */
 .table-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 0;
+  padding: 16px 0 12px;
 }
 
 .toolbar-left {
@@ -1306,12 +1158,12 @@ export default {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #909399;
-  font-size: 13px;
 }
 
-.table-result-count {
-  white-space: nowrap;
+.table-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
 }
 
 ::v-deep .el-table {
@@ -1335,6 +1187,55 @@ export default {
     font-weight: 600;
     color: #1f2d3d;
   }
+}
+
+/* 状态文字 */
+.status-text {
+  font-size: 13px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+
+  &.status-paid {
+    color: #67c23a;
+    background: #f0f9eb;
+  }
+
+  &.status-unpaid {
+    color: #909399;
+    background: #f4f4f5;
+  }
+
+  &.status-pending {
+    color: #409eff;
+    background: #ecf5ff;
+  }
+
+  &.status-refunded {
+    color: #909399;
+    background: #f4f4f5;
+  }
+
+  &.status-none {
+    color: #c0c4cc;
+  }
+}
+
+/* 操作列 */
+.action-link {
+  color: #409eff;
+  cursor: pointer;
+  font-size: 13px;
+
+  &:hover {
+    color: #66b1ff;
+  }
+}
+
+.action-divider {
+  color: #dcdfe6;
+  margin: 0 6px;
+  font-size: 12px;
 }
 
 /* 订单号单元格 */
