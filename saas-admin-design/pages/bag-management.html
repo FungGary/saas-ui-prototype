@@ -1,0 +1,2079 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>背包管理</title>
+    <style id="theme-vars">
+/* SaaS Admin Design - Element UI Style Brand CSS */
+:root {
+  /* Primary Colors - Element UI Blue */
+  --color-primary: #409EFF;
+  --color-primary-light: #66B1FF;
+  --color-primary-lighter: #C6E2FF;
+  --color-primary-lightest: #ECF5FF;
+  --color-primary-dark: #3A8EE6;
+
+  /* State Colors */
+  --state-success: #67C23A;
+  --state-success-light: #E1F3D8;
+  --state-success-lighter: #F0F9EB;
+  --state-warning: #E6A23C;
+  --state-warning-light: #FAECD8;
+  --state-warning-lighter: #FDF6EC;
+  --state-error: #F56C6C;
+  --state-error-light: #FDE2E2;
+  --state-error-lighter: #FEF0F0;
+  --state-info: #909399;
+  --state-info-light: #E9E9EB;
+  --state-info-lighter: #F4F4F5;
+
+  /* Neutral Colors */
+  --color-text-primary: #303133;
+  --color-text-regular: #606266;
+  --color-text-secondary: #909399;
+  --color-text-placeholder: #C0C4CC;
+  --color-border: #DCDFE6;
+  --color-border-light: #E4E7ED;
+  --color-border-lighter: #EBEEF5;
+  --color-border-extra-light: #F2F6FC;
+  --color-bg-page: #F2F3F5;
+  --color-bg-card: #FFFFFF;
+  --color-bg-sidebar: #304156;
+  --color-bg-sidebar-dark: #1F2D3D;
+  --color-bg-header: #FFFFFF;
+  --color-bg-hover: #F5F7FA;
+
+  /* Typography */
+  --font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'SimSun', sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-xxl: 24px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-base: 1.5;
+  --line-height-tight: 1.25;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-base: 16px;
+  --space-lg: 20px;
+  --space-xl: 24px;
+  --space-xxl: 32px;
+
+  /* Radius */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-round: 50%;
+
+  /* Shadows */
+  --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-dropdown: 0 2px 12px rgba(0, 0, 0, 0.05);
+  --shadow-dialog: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  /* Layout */
+  --sidebar-width: 210px;
+  --sidebar-collapsed-width: 64px;
+  --header-height: 50px;
+  --header-height-tabs: 84px;
+}
+
+/* Base Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-base);
+  background: var(--color-bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+/* Utility Classes */
+.text-primary { color: var(--color-text-primary); }
+.text-regular { color: var(--color-text-regular); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-placeholder { color: var(--color-text-placeholder); }
+.text-success { color: var(--state-success); }
+.text-warning { color: var(--state-warning); }
+.text-error { color: var(--state-error); }
+.text-info { color: var(--state-info); }
+
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+
+/* Card Component Style */
+.el-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-lighter);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* Table Component Style */
+.el-table {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+/* Button Component Style */
+.el-button--primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.el-button--primary:hover {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary-light);
+}
+
+/* Tag Styles */
+.el-tag {
+  border-radius: var(--radius-md);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-background); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body>
+  <div class="admin-layout">
+    <!-- ========== SIDEBAR ========== -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">S</div>
+        <span class="logo-text">SaaS 管理系统</span>
+      </div>
+      <nav class="sidebar-menu">
+        <div class="menu-group-title">主菜单</div>
+        <!-- 首页 -->
+        <a class="menu-item" href="#">
+          <span class="menu-icon"><svg viewBox="0 0 24 24"><path d="M3 12l9-9 9 9"/><path d="M5 10v10a1 1 0 001 1h3v-6h6v6h3a1 1 0 001-1V10"/></svg></span>
+          <span class="menu-label">首页</span>
+        </a>
+
+        <!-- 订单管理 (expanded) -->
+        <a class="menu-item expanded" href="#">
+          <span class="menu-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
+          <span class="menu-label">订单管理</span>
+          <span class="menu-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </a>
+        <div class="sub-menu open">
+          <a class="menu-item active" href="#">
+            <span class="menu-label">背包管理</span>
+          </a>
+          <a class="menu-item" href="#">
+            <span class="menu-label">发货管理</span>
+          </a>
+          <a class="menu-item" href="#">
+            <span class="menu-label">积分记录</span>
+          </a>
+        </div>
+
+        <!-- 商品管理 -->
+        <a class="menu-item" href="#">
+          <span class="menu-icon"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></span>
+          <span class="menu-label">商品管理</span>
+          <span class="menu-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>
+        </a>
+
+        <!-- 房间管理 -->
+        <a class="menu-item" href="#">
+          <span class="menu-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg></span>
+          <span class="menu-label">房间管理</span>
+        </a>
+
+        <!-- 用户管理 -->
+        <a class="menu-item" href="#">
+          <span class="menu-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></span>
+          <span class="menu-label">用户管理</span>
+        </a>
+
+        <!-- 商户管理 -->
+        <a class="menu-item" href="#">
+          <span class="menu-icon"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
+          <span class="menu-label">商户管理</span>
+        </a>
+
+        <!-- 数据统计 -->
+        <a class="menu-item" href="#">
+          <span class="menu-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+          <span class="menu-label">数据统计</span>
+        </a>
+
+        <!-- 系统设置 -->
+        <a class="menu-item" href="#">
+          <span class="menu-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.32 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>
+          <span class="menu-label">系统设置</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- ========== MAIN ========== -->
+    <div class="main-area">
+      <!-- Header -->
+      <header class="header">
+        <div class="breadcrumb">
+          <a href="#">首页</a>
+          <span class="sep">/</span>
+          <a href="#">订单管理</a>
+          <span class="sep">/</span>
+          <span class="current">背包管理</span>
+        </div>
+        <div class="header-right">
+          <div class="notification-icon" style="position:relative;">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+            <span class="badge-dot"></span>
+          </div>
+          <div class="user-avatar">管</div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="content">
+        <!-- 1. Filter Card -->
+        <div class="filter-card">
+          <div class="filter-row">
+            <div class="filter-row-main">
+              <div class="filter-item">
+                <label>用户信息</label>
+                <div class="filter-input-group input-append-btn">
+                  <input type="text" readonly placeholder="请选择" value="">
+                  <span class="append-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  </span>
+                </div>
+              </div>
+              <div class="filter-item">
+                <label>商户信息</label>
+                <div class="filter-input-group input-append-btn">
+                  <input type="text" readonly placeholder="请选择" value="">
+                  <span class="append-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  </span>
+                </div>
+              </div>
+              <div class="filter-item">
+                <label>房间信息</label>
+                <div class="filter-input-group input-append-btn">
+                  <input type="text" readonly placeholder="请选择" value="">
+                  <span class="append-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  </span>
+                </div>
+              </div>
+              <div class="filter-item">
+                <label>奖品信息</label>
+                <div class="filter-input-group input-append-btn">
+                  <input type="text" readonly placeholder="请选择" value="">
+                  <span class="append-icon">
+                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  </span>
+                </div>
+              </div>
+              <div class="filter-item">
+                <label>来源</label>
+                <div class="filter-input-group">
+                  <select>
+                    <option>请选择</option>
+                    <option>系统发放</option>
+                    <option>积分兑换</option>
+                  </select>
+                </div>
+              </div>
+              <div class="filter-item">
+                <label>获得时间</label>
+                <div class="filter-input-group date-range">
+                  <input type="date" placeholder="开始日期">
+                  <span class="date-sep">-</span>
+                  <input type="date" placeholder="结束日期">
+                </div>
+              </div>
+            </div>
+            <div class="filter-actions">
+              <button class="btn">重置</button>
+              <button class="btn btn-primary">查询</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Statistics Cards Row -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon gray">
+              <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a4 4 0 00-8 0v2"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number">10</span>
+              <span class="stat-label">全部</span>
+            </div>
+          </div>
+          <div class="stat-card active">
+            <div class="stat-icon blue">
+              <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number">3</span>
+              <span class="stat-label">寄存中</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon orange">
+              <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number">2</span>
+              <span class="stat-label">已申请发货</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number">2</span>
+              <span class="stat-label">已兑换积分</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number">1</span>
+              <span class="stat-label">过期兑换</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number">1</span>
+              <span class="stat-label">已加入账户</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon gray">
+              <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+            </div>
+            <div class="stat-info">
+              <span class="stat-number">1</span>
+              <span class="stat-label">已赠送</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Table Card -->
+        <div class="table-card">
+          <!-- Tabs -->
+          <div class="table-tabs">
+            <div class="table-tab">全部<span class="tab-count">(10)</span></div>
+            <div class="table-tab active">寄存中<span class="tab-count">(3)</span></div>
+            <div class="table-tab">已申请发货<span class="tab-count">(2)</span></div>
+            <div class="table-tab">已兑换积分<span class="tab-count">(2)</span></div>
+            <div class="table-tab">过期兑换<span class="tab-count">(1)</span></div>
+            <div class="table-tab">已加入账户<span class="tab-count">(1)</span></div>
+            <div class="table-tab">已赠送<span class="tab-count">(1)</span></div>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="table-toolbar">
+            <div class="table-toolbar-left">
+              <button class="btn">
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;margin-right:4px;fill:none;stroke:currentColor;stroke-width:2;vertical-align:middle;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                导出
+              </button>
+              <button class="btn btn-primary">
+                <svg viewBox="0 0 24 24" style="width:14px;height:14px;margin-right:4px;fill:none;stroke:currentColor;stroke-width:2;vertical-align:middle;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                添加
+              </button>
+            </div>
+            <div class="table-toolbar-right">共 10 条</div>
+          </div>
+
+          <!-- Data Table -->
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width:70px;">ID</th>
+                  <th style="min-width:140px;">用户信息</th>
+                  <th style="min-width:200px;">奖品信息</th>
+                  <th style="min-width:160px;">房间信息</th>
+                  <th style="min-width:140px;">商户信息</th>
+                  <th style="width:80px;">来源</th>
+                  <th style="width:100px;">状态</th>
+                  <th style="width:80px;">已兑积分</th>
+                  <th style="min-width:150px;">时间</th>
+                  <th style="width:100px;">操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Row 1 -->
+                <tr>
+                  <td style="color:var(--color-text-primary);font-weight:500;">93018</td>
+                  <td>
+                    <div class="user-cell">
+                      <div class="avatar-sm blue">雾</div>
+                      <div class="user-cell-info">
+                        <span class="user-cell-name">雾眠</span>
+                        <span class="user-cell-id">USR-73001</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="prize-cell">
+                      <div class="prize-img">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+                      </div>
+                      <div class="prize-info">
+                        <span class="prize-name">草莓熊夜灯</span>
+                        <span class="prize-id">sku-901</span>
+                        <span class="prize-category">潮玩周边/灯具</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="room-cell">
+                      <div class="room-img">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                      </div>
+                      <div class="room-info">
+                        <span class="room-name">星空转盘房</span>
+                        <span class="room-id">R-SKY-01</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="merchant-cell">
+                      <div class="avatar-sm green">云</div>
+                      <div class="merchant-info">
+                        <span class="merchant-name">云舟潮玩馆</span>
+                        <span class="merchant-id">m301</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>系统发放</td>
+                  <td><span class="tag tag-blue">寄存中</span></td>
+                  <td><span class="points-none">-</span></td>
+                  <td>
+                    <div class="time-cell">
+                      <div><span class="time-label">获得: </span><span class="time-value">2026-06-29 10:12:31</span></div>
+                      <div><span class="time-label">过期: </span><span class="time-value-muted">2026-08-13</span></div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="action-cell">
+                      <span class="action-link blue">详情</span>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 2 -->
+                <tr>
+                  <td style="color:var(--color-text-primary);font-weight:500;">93017</td>
+                  <td>
+                    <div class="user-cell">
+                      <div class="avatar-sm blue">山</div>
+                      <div class="user-cell-info">
+                        <span class="user-cell-name">山栀</span>
+                        <span class="user-cell-id">USR-73002</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="prize-cell">
+                      <div class="prize-img">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+                      </div>
+                      <div class="prize-info">
+                        <span class="prize-name">迷你积木花束</span>
+                        <span class="prize-id">sku-905</span>
+                        <span class="prize-category">潮玩周边/积木</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="room-none">-(无房间)</span>
+                  </td>
+                  <td>
+                    <div class="merchant-cell">
+                      <div class="avatar-sm green">拾</div>
+                      <div class="merchant-info">
+                        <span class="merchant-name">拾光积分铺</span>
+                        <span class="merchant-id">m302</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>积分兑换</td>
+                  <td><span class="tag tag-blue">寄存中</span></td>
+                  <td><span class="points-none">-</span></td>
+                  <td>
+                    <div class="time-cell">
+                      <div><span class="time-label">获得: </span><span class="time-value">2026-06-29 09:40:18</span></div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="action-cell">
+                      <span class="action-link blue">详情</span>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 3 -->
+                <tr>
+                  <td style="color:var(--color-text-primary);font-weight:500;">93016</td>
+                  <td>
+                    <div class="user-cell">
+                      <div class="avatar-sm blue">鲸</div>
+                      <div class="user-cell-info">
+                        <span class="user-cell-name">鲸落</span>
+                        <span class="user-cell-id">USR-73003</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="prize-cell">
+                      <div class="prize-img">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+                      </div>
+                      <div class="prize-info">
+                        <span class="prize-name">星球杯盲盒套装</span>
+                        <span class="prize-id">sku-902</span>
+                        <span class="prize-category">盲盒/套装</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="room-cell">
+                      <div class="room-img">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                      </div>
+                      <div class="room-info">
+                        <span class="room-name">九号幸运屋</span>
+                        <span class="room-id">R-LUCK-09</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="merchant-cell">
+                      <div class="avatar-sm green">云</div>
+                      <div class="merchant-info">
+                        <span class="merchant-name">云舟潮玩馆</span>
+                        <span class="merchant-id">m301</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>系统发放</td>
+                  <td><span class="tag tag-orange">已申请发货</span></td>
+                  <td><span class="points-none">-</span></td>
+                  <td>
+                    <div class="time-cell">
+                      <div><span class="time-label">获得: </span><span class="time-value">2026-06-28 20:05:11</span></div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="action-cell">
+                      <span class="action-link blue">详情</span>
+                      <span class="action-link red">驳回</span>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 4 -->
+                <tr>
+                  <td style="color:var(--color-text-primary);font-weight:500;">93015</td>
+                  <td>
+                    <div class="user-cell">
+                      <div class="avatar-sm blue">白</div>
+                      <div class="user-cell-info">
+                        <span class="user-cell-name">白露</span>
+                        <span class="user-cell-id">USR-73004</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="prize-cell">
+                      <div class="prize-img">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+                      </div>
+                      <div class="prize-info">
+                        <span class="prize-name">蓝牙复古音箱</span>
+                        <span class="prize-id">sku-903</span>
+                        <span class="prize-category">数码生活/音箱</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="room-cell">
+                      <div class="room-img">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                      </div>
+                      <div class="room-info">
+                        <span class="room-name">十八号体验台</span>
+                        <span class="room-id">R-TECH-18</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="merchant-cell">
+                      <div class="avatar-sm green">北</div>
+                      <div class="merchant-info">
+                        <span class="merchant-name">北辰活动中心</span>
+                        <span class="merchant-id">m303</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>积分兑换</td>
+                  <td><span class="tag tag-orange">已申请发货</span></td>
+                  <td><span class="points-none">-</span></td>
+                  <td>
+                    <div class="time-cell">
+                      <div><span class="time-label">获得: </span><span class="time-value">2026-06-28 13:55:45</span></div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="action-cell">
+                      <span class="action-link blue">详情</span>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Row 5 -->
+                <tr>
+                  <td style="color:var(--color-text-primary);font-weight:500;">93014</td>
+                  <td>
+                    <div class="user-cell">
+                      <div class="avatar-sm blue">青</div>
+                      <div class="user-cell-info">
+                        <span class="user-cell-name">青岚</span>
+                        <span class="user-cell-id">USR-73005</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="prize-cell">
+                      <div class="prize-img">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+                      </div>
+                      <div class="prize-info">
+                        <span class="prize-name">草莓熊夜灯</span>
+                        <span class="prize-id">sku-901</span>
+                        <span class="prize-category">潮玩周边/灯具</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="room-cell">
+                      <div class="room-img">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                      </div>
+                      <div class="room-info">
+                        <span class="room-name">潮玩快闪间</span>
+                        <span class="room-id">R-POP-26</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="merchant-cell">
+                      <div class="avatar-sm green">拾</div>
+                      <div class="merchant-info">
+                        <span class="merchant-name">拾光积分铺</span>
+                        <span class="merchant-id">m302</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>系统发放</td>
+                  <td><span class="tag tag-green">已兑换积分</span></td>
+                  <td><span class="points-value">260</span></td>
+                  <td>
+                    <div class="time-cell">
+                      <div><span class="time-label">获得: </span><span class="time-value">2026-06-27 18:22:09</span></div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="action-cell">
+                      <span class="action-link blue">详情</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination-bar">
+            <div class="pagination-info">共 10 条</div>
+            <div class="pagination">
+              <span class="page-size">10条/页</span>
+              <button class="page-btn" disabled>
+                <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn" disabled>
+                <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ========== DETAIL DRAWER ========== -->
+    <div class="drawer-backdrop"></div>
+    <div class="drawer-panel">
+      <!-- Drawer Header -->
+      <div class="drawer-header">
+        <span class="drawer-title">背包详情</span>
+        <span class="drawer-close">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </span>
+      </div>
+
+      <!-- Drawer Body -->
+      <div class="drawer-body">
+        <!-- Summary Card -->
+        <div class="drawer-summary">
+          <div class="drawer-summary-item">
+            <span class="label">背包ID:</span>
+            <span>93018</span>
+          </div>
+          <div class="drawer-summary-sep"></div>
+          <div class="drawer-summary-item">
+            <span class="label">奖品:</span>
+            <span>草莓熊夜灯</span>
+          </div>
+          <div class="drawer-summary-sep"></div>
+          <div class="drawer-summary-item">
+            <span class="label">状态:</span>
+            <span class="tag tag-blue" style="margin:0;">寄存中</span>
+          </div>
+          <div class="drawer-summary-sep"></div>
+          <div class="drawer-summary-item">
+            <span class="label">已兑积分:</span>
+            <span>-</span>
+          </div>
+        </div>
+
+        <!-- 主体信息 -->
+        <div class="drawer-section">
+          <div class="drawer-section-title">主体信息</div>
+          <div class="person-cards">
+            <div class="person-card">
+              <div class="person-avatar blue">雾</div>
+              <div class="person-details">
+                <span class="person-name">雾眠</span>
+                <span class="person-id">USR-73001 / UID:71001</span>
+                <span class="person-id">139****4201</span>
+              </div>
+            </div>
+            <div class="person-card">
+              <div class="person-avatar green">云</div>
+              <div class="person-details">
+                <span class="person-name">云舟潮玩馆</span>
+                <span class="person-id">商户ID: m301</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 奖品与房间 -->
+        <div class="drawer-section">
+          <div class="drawer-section-title">奖品与房间</div>
+          <div class="desc-grid">
+            <div class="desc-item">
+              <span class="desc-label">奖品名称:</span>
+              <span class="desc-value">草莓熊夜灯</span>
+            </div>
+            <div class="desc-item">
+              <span class="desc-label">商品ID:</span>
+              <span class="desc-value">sku-901</span>
+            </div>
+            <div class="desc-item">
+              <span class="desc-label">商品分类:</span>
+              <span class="desc-value">潮玩周边/灯具</span>
+            </div>
+            <div class="desc-item">
+              <span class="desc-label">房间信息:</span>
+              <span class="desc-value">星空转盘房 (R-SKY-01)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 来源与状态 -->
+        <div class="drawer-section">
+          <div class="drawer-section-title">来源与状态</div>
+          <div class="desc-grid-full">
+            <div class="desc-row">
+              <span class="desc-label">来源类型:</span>
+              <span class="desc-value">系统发放</span>
+            </div>
+            <div class="desc-row">
+              <span class="desc-label">来源单号:</span>
+              <span class="desc-value" style="color:var(--color-text-placeholder);">-</span>
+            </div>
+            <div class="desc-row">
+              <span class="desc-label">派奖原因:</span>
+              <span class="desc-value">活动奖励</span>
+            </div>
+            <div class="desc-row">
+              <span class="desc-label">当前状态:</span>
+              <span class="desc-value"><span class="tag tag-blue" style="margin:0;">寄存中</span></span>
+            </div>
+            <div class="desc-row">
+              <span class="desc-label">获得时间:</span>
+              <span class="desc-value">2026-06-29 10:12:31</span>
+            </div>
+            <div class="desc-row">
+              <span class="desc-label">兑换时间:</span>
+              <span class="desc-value" style="color:var(--color-text-placeholder);">-</span>
+            </div>
+            <div class="desc-row">
+              <span class="desc-label">过期时间:</span>
+              <span class="desc-value">2026-08-13</span>
+            </div>
+            <div class="desc-row">
+              <span class="desc-label">已兑积分:</span>
+              <span class="desc-value" style="color:var(--color-text-placeholder);">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 操作记录 -->
+        <div class="drawer-section">
+          <div class="drawer-section-title">操作记录</div>
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-time">2026-06-29 10:12:31</div>
+              <div class="timeline-content">系统发放奖品，进入背包寄存</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <style>
+    /* ============ LAYOUT ============ */
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+      min-width: 1440px;
+    }
+
+    /* ============ SIDEBAR ============ */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--color-bg-sidebar);
+      color: #bfcbd9;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      height: 50px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      background: var(--color-bg-sidebar-dark);
+    }
+
+    .sidebar-logo .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--color-primary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: 700;
+      font-size: 16px;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-logo .logo-text {
+      color: #fff;
+      font-size: 15px;
+      font-weight: var(--font-weight-medium);
+      white-space: nowrap;
+    }
+
+    .sidebar-menu {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+
+    .menu-group-title {
+      padding: 12px 20px 6px;
+      font-size: 12px;
+      color: #6b7a8d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      height: 44px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 14px;
+      color: #bfcbd9;
+      position: relative;
+      text-decoration: none;
+    }
+
+    .menu-item:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .menu-item .menu-icon {
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .menu-item .menu-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .menu-item .menu-label {
+      flex: 1;
+      white-space: nowrap;
+    }
+
+    .menu-item .menu-arrow {
+      width: 12px;
+      height: 12px;
+      transition: transform 0.25s;
+    }
+
+    .menu-item .menu-arrow svg {
+      width: 12px;
+      height: 12px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .menu-item.expanded .menu-arrow {
+      transform: rotate(90deg);
+    }
+
+    /* Sub-menu */
+    .sub-menu {
+      display: none;
+    }
+
+    .sub-menu.open {
+      display: block;
+    }
+
+    .sub-menu .menu-item {
+      padding-left: 50px;
+      height: 42px;
+      font-size: 13px;
+    }
+
+    .sub-menu .menu-item.active {
+      color: var(--color-primary-light);
+      background: rgba(64, 158, 255, 0.12);
+    }
+
+    .sub-menu .menu-item.active::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--color-primary-light);
+      border-radius: 0 2px 2px 0;
+    }
+
+    /* ============ MAIN AREA ============ */
+    .main-area {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ============ HEADER ============ */
+    .header {
+      height: var(--header-height);
+      background: var(--color-bg-header);
+      border-bottom: 1px solid var(--color-border-lighter);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+
+    .breadcrumb a {
+      color: var(--color-text-secondary);
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+      color: var(--color-primary);
+    }
+
+    .breadcrumb .sep {
+      margin: 0 8px;
+      color: var(--color-text-placeholder);
+    }
+
+    .breadcrumb .current {
+      color: var(--color-text-primary);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-right .notification-icon {
+      width: 20px;
+      height: 20px;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .header-right .notification-icon svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+    }
+
+    .header-right .badge-dot {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      width: 8px;
+      height: 8px;
+      background: var(--state-error);
+      border-radius: var(--radius-round);
+      border: 1px solid #fff;
+    }
+
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-round);
+      background: var(--color-primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: var(--font-weight-medium);
+    }
+
+    /* ============ CONTENT ============ */
+    .content {
+      flex: 1;
+      padding: var(--space-base);
+      background: var(--color-bg-page);
+      overflow-y: auto;
+    }
+
+    /* ============ FILTER CARD ============ */
+    .filter-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-lighter);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      padding: var(--space-lg) var(--space-xxl);
+      margin-bottom: var(--space-base);
+    }
+
+    .filter-row {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-base);
+      flex-wrap: wrap;
+    }
+
+    .filter-row-main {
+      flex: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-base) var(--space-lg);
+    }
+
+    .filter-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .filter-item label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-regular);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .filter-input-group {
+      display: flex;
+      align-items: center;
+    }
+
+    .filter-input-group input,
+    .filter-input-group select {
+      height: 32px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 0 10px;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+      background: var(--color-bg-card);
+      outline: none;
+      font-family: var(--font-family);
+    }
+
+    .filter-input-group input[readonly] {
+      background: var(--color-bg-hover);
+      cursor: default;
+      width: 180px;
+    }
+
+    .filter-input-group select {
+      width: 140px;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23C0C4CC' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 28px;
+    }
+
+    .input-append-btn {
+      display: flex;
+      align-items: center;
+    }
+
+    .input-append-btn input {
+      border-radius: var(--radius-md) 0 0 var(--radius-md);
+      border-right: none;
+    }
+
+    .input-append-btn .append-icon {
+      height: 32px;
+      width: 36px;
+      border: 1px solid var(--color-border);
+      border-left: none;
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      background: var(--color-bg-hover);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--color-text-secondary);
+    }
+
+    .input-append-btn .append-icon svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .date-range {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .date-range input {
+      width: 150px;
+    }
+
+    .date-range .date-sep {
+      color: var(--color-text-placeholder);
+      font-size: 13px;
+    }
+
+    .filter-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-top: 22px;
+    }
+
+    .btn {
+      height: 32px;
+      padding: 0 16px;
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      font-family: var(--font-family);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-card);
+      color: var(--color-text-regular);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--color-primary-light);
+      border-color: var(--color-primary-light);
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: var(--space-sm);
+      align-items: center;
+      padding-top: 22px;
+    }
+
+    /* ============ STATISTICS CARDS ============ */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: var(--space-base);
+      margin-bottom: var(--space-base);
+    }
+
+    .stat-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-lighter);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      padding: var(--space-lg) var(--space-base);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .stat-card:hover {
+      border-color: var(--color-border);
+    }
+
+    .stat-card.active {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 1px var(--color-primary), 0 2px 12px rgba(64, 158, 255, 0.15);
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-round);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .stat-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .stat-icon.gray { background: var(--state-info); }
+    .stat-icon.blue { background: var(--color-primary); }
+    .stat-icon.orange { background: var(--state-warning); }
+    .stat-icon.green { background: var(--state-success); }
+    .stat-icon.red { background: var(--state-error); }
+
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-number {
+      font-size: 22px;
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text-primary);
+      line-height: 1.2;
+    }
+
+    .stat-label {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      margin-top: 2px;
+    }
+
+    /* ============ TABLE CARD ============ */
+    .table-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-lighter);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+
+    .table-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--color-border-lighter);
+      padding: 0 var(--space-xxl);
+    }
+
+    .table-tab {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-regular);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .table-tab:hover {
+      color: var(--color-primary);
+    }
+
+    .table-tab.active {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .table-tab .tab-count {
+      margin-left: 4px;
+      color: var(--color-text-placeholder);
+      font-size: var(--font-size-xs);
+    }
+
+    .table-tab.active .tab-count {
+      color: var(--color-primary-light);
+    }
+
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) var(--space-xxl);
+    }
+
+    .table-toolbar-left {
+      display: flex;
+      gap: var(--space-sm);
+    }
+
+    .table-toolbar-right {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    /* Data Table */
+    .data-table-wrapper {
+      overflow-x: auto;
+      padding: 0 var(--space-xxl) var(--space-base);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--font-size-sm);
+      min-width: 1100px;
+    }
+
+    .data-table thead th {
+      background: var(--color-bg-hover);
+      color: var(--color-text-regular);
+      font-weight: var(--font-weight-medium);
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--color-border-lighter);
+      border-top: 1px solid var(--color-border-lighter);
+      white-space: nowrap;
+      font-size: var(--font-size-xs);
+    }
+
+    .data-table tbody td {
+      padding: 12px 12px;
+      border-bottom: 1px solid var(--color-border-lighter);
+      color: var(--color-text-regular);
+      vertical-align: top;
+    }
+
+    .data-table tbody tr:hover {
+      background: var(--color-bg-hover);
+    }
+
+    /* Avatar in table */
+    .avatar-sm {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-round);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 12px;
+      font-weight: var(--font-weight-medium);
+      flex-shrink: 0;
+    }
+
+    .avatar-sm.blue { background: var(--color-primary); }
+    .avatar-sm.green { background: var(--state-success); }
+
+    .user-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .user-cell-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-cell-name {
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
+    }
+
+    .user-cell-id {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+    }
+
+    /* Prize cell */
+    .prize-cell {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .prize-img {
+      width: 40px;
+      height: 40px;
+      background: var(--color-bg-hover);
+      border: 1px solid var(--color-border-lighter);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .prize-img svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: var(--color-text-placeholder);
+      stroke-width: 1.5;
+    }
+
+    .prize-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .prize-name {
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
+    }
+
+    .prize-id {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+    }
+
+    .prize-category {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-placeholder);
+    }
+
+    /* Room cell */
+    .room-cell {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .room-img {
+      width: 36px;
+      height: 36px;
+      background: var(--color-bg-hover);
+      border: 1px solid var(--color-border-lighter);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .room-img svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: var(--color-text-placeholder);
+      stroke-width: 1.5;
+    }
+
+    .room-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .room-name {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .room-id {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+    }
+
+    .room-none {
+      color: var(--color-text-placeholder);
+      font-size: var(--font-size-sm);
+    }
+
+    /* Merchant cell */
+    .merchant-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .merchant-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .merchant-name {
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+    }
+
+    .merchant-id {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+    }
+
+    /* Status tags */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: 10px;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      white-space: nowrap;
+    }
+
+    .tag-blue {
+      background: var(--color-primary-lightest);
+      color: var(--color-primary);
+      border: 1px solid var(--color-primary-lighter);
+    }
+
+    .tag-orange {
+      background: var(--state-warning-lighter);
+      color: var(--state-warning);
+      border: 1px solid var(--state-warning-light);
+    }
+
+    .tag-green {
+      background: var(--state-success-lighter);
+      color: var(--state-success);
+      border: 1px solid var(--state-success-light);
+    }
+
+    .tag-red {
+      background: var(--state-error-lighter);
+      color: var(--state-error);
+      border: 1px solid var(--state-error-light);
+    }
+
+    /* Points exchanged */
+    .points-value {
+      font-weight: var(--font-weight-bold);
+      color: var(--state-warning);
+    }
+
+    .points-none {
+      color: var(--color-text-placeholder);
+    }
+
+    /* Time cell */
+    .time-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: var(--font-size-xs);
+      line-height: 1.4;
+    }
+
+    .time-label {
+      color: var(--color-text-secondary);
+    }
+
+    .time-value {
+      color: var(--color-text-regular);
+    }
+
+    .time-value-muted {
+      color: var(--color-text-placeholder);
+    }
+
+    /* Action cell */
+    .action-cell {
+      display: flex;
+      gap: var(--space-base);
+      white-space: nowrap;
+    }
+
+    .action-link {
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      font-family: var(--font-family);
+    }
+
+    .action-link.blue {
+      color: var(--color-primary);
+    }
+
+    .action-link.red {
+      color: var(--state-error);
+    }
+
+    .action-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Pagination */
+    .pagination-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md) var(--space-xxl);
+      border-top: 1px solid var(--color-border-lighter);
+    }
+
+    .pagination-info {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pagination .page-size {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+      margin-right: var(--space-base);
+    }
+
+    .pagination .page-btn {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 8px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-bg-card);
+      color: var(--color-text-regular);
+      font-size: var(--font-size-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-family: var(--font-family);
+    }
+
+    .pagination .page-btn:hover {
+      color: var(--color-primary);
+    }
+
+    .pagination .page-btn.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+
+    .pagination .page-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    /* ============ DRAWER OVERLAY ============ */
+    .drawer-backdrop {
+      position: fixed;
+      top: 0;
+      left: var(--sidebar-width);
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.35);
+      z-index: 200;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .drawer-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 820px;
+      height: 100vh;
+      background: var(--color-bg-card);
+      box-shadow: -4px 0 16px rgba(0, 0, 0, 0.12);
+      z-index: 300;
+      display: flex;
+      flex-direction: column;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+
+    .drawer-header {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      border-bottom: 1px solid var(--color-border-lighter);
+      flex-shrink: 0;
+    }
+
+    .drawer-title {
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+    }
+
+    .drawer-close {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--color-text-secondary);
+      border-radius: var(--radius-round);
+      transition: background 0.2s;
+    }
+
+    .drawer-close:hover {
+      background: var(--color-bg-hover);
+    }
+
+    .drawer-close svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-xxl) 24px;
+    }
+
+    /* Drawer summary card */
+    .drawer-summary {
+      background: var(--color-bg-hover);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-xl);
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+
+    .drawer-summary-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-regular);
+    }
+
+    .drawer-summary-item .label {
+      color: var(--color-text-secondary);
+    }
+
+    .drawer-summary-sep {
+      width: 1px;
+      height: 24px;
+      background: var(--color-border-lighter);
+    }
+
+    /* Drawer section */
+    .drawer-section {
+      margin-bottom: var(--space-xl);
+    }
+
+    .drawer-section-title {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      padding-left: 10px;
+      border-left: 3px solid var(--color-primary);
+      margin-bottom: var(--space-base);
+      line-height: 1;
+    }
+
+    /* Person cards in drawer */
+    .person-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-base);
+    }
+
+    .person-card {
+      background: var(--color-bg-hover);
+      border-radius: var(--radius-lg);
+      padding: var(--space-base);
+      display: flex;
+      gap: var(--space-md);
+      align-items: flex-start;
+    }
+
+    .person-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-round);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 16px;
+      font-weight: var(--font-weight-medium);
+      flex-shrink: 0;
+    }
+
+    .person-avatar.blue { background: var(--color-primary); }
+    .person-avatar.green { background: var(--state-success); }
+
+    .person-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .person-name {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+    }
+
+    .person-id {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+    }
+
+    /* Description grid */
+    .desc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md) var(--space-xxl);
+    }
+
+    .desc-item {
+      display: flex;
+      gap: var(--space-sm);
+      font-size: var(--font-size-sm);
+      line-height: 1.6;
+    }
+
+    .desc-label {
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+      min-width: 70px;
+    }
+
+    .desc-value {
+      color: var(--color-text-primary);
+    }
+
+    /* Source & Status section - full width descriptions */
+    .desc-grid-full {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-sm) var(--space-xxl);
+    }
+
+    .desc-row {
+      display: flex;
+      gap: var(--space-sm);
+      font-size: var(--font-size-sm);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--color-border-extra-light);
+    }
+
+    .desc-row .desc-label {
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+      min-width: 80px;
+    }
+
+    .desc-row .desc-value {
+      color: var(--color-text-primary);
+    }
+
+    /* Timeline */
+    .timeline {
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: var(--color-border-lighter);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding: 8px 0 8px 20px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -18px;
+      top: 14px;
+      width: 10px;
+      height: 10px;
+      border-radius: var(--radius-round);
+      background: var(--color-primary);
+      border: 2px solid var(--color-primary-lightest);
+    }
+
+    .timeline-time {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .timeline-content {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-regular);
+    }
+  </style>
+</body>
+</html>

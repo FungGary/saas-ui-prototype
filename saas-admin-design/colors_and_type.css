@@ -1,0 +1,147 @@
+/* SaaS Admin Design - Element UI Style Brand CSS */
+:root {
+  /* Primary Colors - Element UI Blue */
+  --color-primary: #409EFF;
+  --color-primary-light: #66B1FF;
+  --color-primary-lighter: #C6E2FF;
+  --color-primary-lightest: #ECF5FF;
+  --color-primary-dark: #3A8EE6;
+
+  /* State Colors */
+  --state-success: #67C23A;
+  --state-success-light: #E1F3D8;
+  --state-success-lighter: #F0F9EB;
+  --state-warning: #E6A23C;
+  --state-warning-light: #FAECD8;
+  --state-warning-lighter: #FDF6EC;
+  --state-error: #F56C6C;
+  --state-error-light: #FDE2E2;
+  --state-error-lighter: #FEF0F0;
+  --state-info: #909399;
+  --state-info-light: #E9E9EB;
+  --state-info-lighter: #F4F4F5;
+
+  /* Neutral Colors */
+  --color-text-primary: #303133;
+  --color-text-regular: #606266;
+  --color-text-secondary: #909399;
+  --color-text-placeholder: #C0C4CC;
+  --color-border: #DCDFE6;
+  --color-border-light: #E4E7ED;
+  --color-border-lighter: #EBEEF5;
+  --color-border-extra-light: #F2F6FC;
+  --color-bg-page: #F2F3F5;
+  --color-bg-card: #FFFFFF;
+  --color-bg-sidebar: #304156;
+  --color-bg-sidebar-dark: #1F2D3D;
+  --color-bg-header: #FFFFFF;
+  --color-bg-hover: #F5F7FA;
+
+  /* Typography */
+  --font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'SimSun', sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-xxl: 24px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-base: 1.5;
+  --line-height-tight: 1.25;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-base: 16px;
+  --space-lg: 20px;
+  --space-xl: 24px;
+  --space-xxl: 32px;
+
+  /* Radius */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-round: 50%;
+
+  /* Shadows */
+  --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-dropdown: 0 2px 12px rgba(0, 0, 0, 0.05);
+  --shadow-dialog: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  /* Layout */
+  --sidebar-width: 210px;
+  --sidebar-collapsed-width: 64px;
+  --header-height: 50px;
+  --header-height-tabs: 84px;
+}
+
+/* Base Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-base);
+  background: var(--color-bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+/* Utility Classes */
+.text-primary { color: var(--color-text-primary); }
+.text-regular { color: var(--color-text-regular); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-placeholder { color: var(--color-text-placeholder); }
+.text-success { color: var(--state-success); }
+.text-warning { color: var(--state-warning); }
+.text-error { color: var(--state-error); }
+.text-info { color: var(--state-info); }
+
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+
+/* Card Component Style */
+.el-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-lighter);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* Table Component Style */
+.el-table {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+/* Button Component Style */
+.el-button--primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.el-button--primary:hover {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary-light);
+}
+
+/* Tag Styles */
+.el-tag {
+  border-radius: var(--radius-md);
+}

@@ -1,0 +1,58 @@
+{
+  "project": {
+    "name": "SaaS后台管理系统设计稿",
+    "path": "c:\\Users\\1\\Desktop\\SAAS-UI - 副本\\saas-admin-design",
+    "operation": "create",
+    "deviceType": "desktop",
+    "language": "zh-CN",
+    "dashboardMode": false,
+    "replicationMode": null,
+    "sourceUrl": null,
+    "visualSpecExcerpt": null,
+    "styleDefinitionBrief": "SaaS电商后台管理系统，Element UI经典蓝白风格，深色侧边栏+白色内容区，标准管理后台密度",
+    "designRead": "B2B SaaS admin panel / operations team / clean enterprise utility / high density / avoid playful or editorial aesthetics",
+    "designDials": {
+      "layoutVariance": 1,
+      "motionIntensity": 1,
+      "visualDensity": 4
+    }
+  },
+  "designSource": {
+    "operatingMode": "free-explore",
+    "libraryIdentity": null,
+    "brandCssPath": "colors_and_type.css",
+    "brandPrefix": "--"
+  },
+  "pages": [
+    {
+      "nodeId": "page-admin-layout",
+      "title": "后台管理布局",
+      "htmlSrc": "pages/admin-layout.html",
+      "pageIndex": 1,
+      "pageType": "information-dense",
+      "visualNorthStar": "Classic admin shell: dark sidebar with collapsible menu tree, white header with breadcrumb, tab navigation, and main content area with dashboard cards",
+      "soulElement": "Sidebar uses gradient dark theme (#304156 to #1F2D3D) with active menu highlight using brand blue, creating a professional enterprise management feel"
+    },
+    {
+      "nodeId": "page-user-management",
+      "title": "用户管理",
+      "htmlSrc": "pages/user-management.html",
+      "pageIndex": 2,
+      "pageType": "information-dense",
+      "visualNorthStar": "Standard CRUD table page: filter card at top, tabbed channel counts, sortable data table with avatar+name composite cells, status tags, and pagination",
+      "soulElement": "User info column merges avatar, nickname, and user ID into one compact cell, maximizing information density while keeping scannability"
+    },
+    {
+      "nodeId": "page-bag-management",
+      "title": "背包管理",
+      "htmlSrc": "pages/bag-management.html",
+      "pageIndex": 3,
+      "pageType": "information-dense",
+      "visualNorthStar": "Inventory management page with filter card, stat summary cards row, tabbed data table, and slide-out detail drawer with timeline",
+      "soulElement": "Stat cards use colored icon circles to create visual rhythm before the dense table, making key metrics instantly scannable"
+    }
+  ],
+  "assets": [],
+  "wiringPlan": [],
+  "hiddenInteractionPlan": []
+}

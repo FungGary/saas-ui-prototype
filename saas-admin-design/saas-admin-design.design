@@ -1,0 +1,54 @@
+{
+  "data": [
+    {
+      "id": "page-admin-layout",
+      "type": "page",
+      "title": "后台管理布局",
+      "version": 1,
+      "createdAt": 1782890400000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/admin-layout.html"
+      }
+    },
+    {
+      "id": "page-user-management",
+      "type": "page",
+      "title": "用户管理",
+      "version": 1,
+      "createdAt": 1782890401000,
+      "canvasData": {
+        "x": 620,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/user-management.html"
+      }
+    },
+    {
+      "id": "page-bag-management",
+      "type": "page",
+      "title": "背包管理",
+      "version": 1,
+      "createdAt": 1782890402000,
+      "canvasData": {
+        "x": 1240,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/bag-management.html"
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "projectName": "SaaS后台管理系统设计稿"
+  }
+}

@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理</title>
+    <style id="theme-vars">
+/* SaaS Admin Design - Element UI Style Brand CSS */
+:root {
+  /* Primary Colors - Element UI Blue */
+  --color-primary: #409EFF;
+  --color-primary-light: #66B1FF;
+  --color-primary-lighter: #C6E2FF;
+  --color-primary-lightest: #ECF5FF;
+  --color-primary-dark: #3A8EE6;
+
+  /* State Colors */
+  --state-success: #67C23A;
+  --state-success-light: #E1F3D8;
+  --state-success-lighter: #F0F9EB;
+  --state-warning: #E6A23C;
+  --state-warning-light: #FAECD8;
+  --state-warning-lighter: #FDF6EC;
+  --state-error: #F56C6C;
+  --state-error-light: #FDE2E2;
+  --state-error-lighter: #FEF0F0;
+  --state-info: #909399;
+  --state-info-light: #E9E9EB;
+  --state-info-lighter: #F4F4F5;
+
+  /* Neutral Colors */
+  --color-text-primary: #303133;
+  --color-text-regular: #606266;
+  --color-text-secondary: #909399;
+  --color-text-placeholder: #C0C4CC;
+  --color-border: #DCDFE6;
+  --color-border-light: #E4E7ED;
+  --color-border-lighter: #EBEEF5;
+  --color-border-extra-light: #F2F6FC;
+  --color-bg-page: #F2F3F5;
+  --color-bg-card: #FFFFFF;
+  --color-bg-sidebar: #304156;
+  --color-bg-sidebar-dark: #1F2D3D;
+  --color-bg-header: #FFFFFF;
+  --color-bg-hover: #F5F7FA;
+
+  /* Typography */
+  --font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'SimSun', sans-serif;
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-xxl: 24px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-base: 1.5;
+  --line-height-tight: 1.25;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-base: 16px;
+  --space-lg: 20px;
+  --space-xl: 24px;
+  --space-xxl: 32px;
+
+  /* Radius */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-round: 50%;
+
+  /* Shadows */
+  --shadow-card: 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-dropdown: 0 2px 12px rgba(0, 0, 0, 0.05);
+  --shadow-dialog: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+  /* Layout */
+  --sidebar-width: 210px;
+  --sidebar-collapsed-width: 64px;
+  --header-height: 50px;
+  --header-height-tabs: 84px;
+}
+
+/* Base Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--color-text-primary);
+  line-height: var(--line-height-base);
+  background: var(--color-bg-page);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+/* Utility Classes */
+.text-primary { color: var(--color-text-primary); }
+.text-regular { color: var(--color-text-regular); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-placeholder { color: var(--color-text-placeholder); }
+.text-success { color: var(--state-success); }
+.text-warning { color: var(--state-warning); }
+.text-error { color: var(--state-error); }
+.text-info { color: var(--state-info); }
+
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+
+/* Card Component Style */
+.el-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-lighter);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* Table Component Style */
+.el-table {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+/* Button Component Style */
+.el-button--primary {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.el-button--primary:hover {
+  background-color: var(--color-primary-light);
+  border-color: var(--color-primary-light);
+}
+
+/* Tag Styles */
+.el-tag {
+  border-radius: var(--radius-md);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-background); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+
+        <!-- ==================== SIDEBAR ==================== -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <div class="sidebar-logo-icon">S</div>
+                <span class="sidebar-logo-text">SaaS Admin</span>
+            </div>
+            <ul class="sidebar-menu">
+                <!-- Dashboard -->
+                <li class="sidebar-menu-item">
+                    <a class="sidebar-menu-item-title" href="#">
+                        <span class="menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        </span>
+                        <span>首页</span>
+                    </a>
+                </li>
+
+                <!-- User Management (Expanded / Active) -->
+                <li class="sidebar-menu-item expanded">
+                    <a class="sidebar-menu-item-title" href="#">
+                        <span class="menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                        </span>
+                        <span>用户管理</span>
+                        <span class="menu-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </span>
+                    </a>
+                    <ul class="sidebar-submenu">
+                        <li><a class="sidebar-submenu-item active" href="#">用户列表</a></li>
+                        <li><a class="sidebar-submenu-item" href="#">用户等级</a></li>
+                        <li><a class="sidebar-submenu-item" href="#">主播管理</a></li>
+                        <li><a class="sidebar-submenu-item" href="#">实名认证</a></li>
+                    </ul>
+                </li>
+
+                <!-- Content Management -->
+                <li class="sidebar-menu-item">
+                    <a class="sidebar-menu-item-title" href="#">
+                        <span class="menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        </span>
+                        <span>内容管理</span>
+                        <span class="menu-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </span>
+                    </a>
+                    <ul class="sidebar-submenu">
+                        <li><a class="sidebar-submenu-item" href="#">内容审核</a></li>
+                        <li><a class="sidebar-submenu-item" href="#">举报管理</a></li>
+                    </ul>
+                </li>
+
+                <!-- Order Management -->
+                <li class="sidebar-menu-item">
+                    <a class="sidebar-menu-item-title" href="#">
+                        <span class="menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                        </span>
+                        <span>订单管理</span>
+                        <span class="menu-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </span>
+                    </a>
+                    <ul class="sidebar-submenu">
+                        <li><a class="sidebar-submenu-item" href="#">订单列表</a></li>
+                        <li><a class="sidebar-submenu-item" href="#">退款管理</a></li>
+                    </ul>
+                </li>
+
+                <!-- Finance -->
+                <li class="sidebar-menu-item">
+                    <a class="sidebar-menu-item-title" href="#">
+                        <span class="menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </span>
+                        <span>财务管理</span>
+                        <span class="menu-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </span>
+                    </a>
+                    <ul class="sidebar-submenu">
+                        <li><a class="sidebar-submenu-item" href="#">资金流水</a></li>
+                        <li><a class="sidebar-submenu-item" href="#">提现审核</a></li>
+                    </ul>
+                </li>
+
+                <!-- System Settings -->
+                <li class="sidebar-menu-item">
+                    <a class="sidebar-menu-item-title" href="#">
+                        <span class="menu-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                        </span>
+                        <span>系统设置</span>
+                        <span class="menu-arrow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </span>
+                    </a>
+                    <ul class="sidebar-submenu">
+                        <li><a class="sidebar-submenu-item" href="#">基本设置</a></li>
+                        <li><a class="sidebar-submenu-item" href="#">角色权限</a></li>
+                        <li><a class="sidebar-submenu-item" href="#">操作日志</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- ==================== MAIN ==================== -->
+        <div class="main-area">
+
+            <!-- Header -->
+            <header class="admin-header">
+                <div class="breadcrumb">
+                    <a href="#">首页</a>
+                    <span class="separator">/</span>
+                    <a href="#">用户管理</a>
+                    <span class="separator">/</span>
+                    <span class="current">用户列表</span>
+                </div>
+                <div class="header-right">
+                    <div class="header-icon-btn" title="消息">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        <span class="header-badge"></span>
+                    </div>
+                    <div class="header-icon-btn" title="全屏">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+                    </div>
+                    <div class="header-avatar">管</div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="content-area">
+
+                <!-- ===== Filter Card ===== -->
+                <div class="filter-card">
+                    <div class="filter-row">
+                        <div class="filter-item">
+                            <span class="filter-label">用户信息</span>
+                            <input class="filter-input" type="text" placeholder="手机号/昵称/用户编号">
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">用户等级</span>
+                            <select class="filter-select">
+                                <option>全部</option>
+                                <option>Lv1</option>
+                                <option>Lv2</option>
+                                <option>Lv3</option>
+                                <option>Lv4</option>
+                                <option>Lv5</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">身份</span>
+                            <select class="filter-select">
+                                <option>全部</option>
+                                <option>用户</option>
+                                <option>主播</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">账户状态</span>
+                            <select class="filter-select">
+                                <option>全部</option>
+                                <option>正常</option>
+                                <option>禁用</option>
+                                <option>注销</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-label">禁言状态</span>
+                            <select class="filter-select">
+                                <option>全部</option>
+                                <option>正常</option>
+                                <option>临时禁言</option>
+                                <option>永久禁言</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-row">
+                        <div class="filter-item">
+                            <span class="filter-label">创建时间</span>
+                            <div class="filter-date-range">
+                                <input class="filter-date" type="date" value="2026-05-01">
+                                <span class="date-sep">至</span>
+                                <input class="filter-date" type="date" value="2026-06-06">
+                            </div>
+                        </div>
+                        <div class="filter-actions">
+                            <button class="btn btn-primary">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                查询
+                            </button>
+                            <button class="btn btn-default">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                                重置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== Tab Navigation ===== -->
+                <div class="tab-nav">
+                    <div class="tab-nav-inner">
+                        <div class="tab-item active">全部<span class="tab-count">(1730)</span></div>
+                        <div class="tab-item">微信公众号<span class="tab-count">(300)</span></div>
+                        <div class="tab-item">微信小程序<span class="tab-count">(600)</span></div>
+                        <div class="tab-item">H5<span class="tab-count">(300)</span></div>
+                        <div class="tab-item">APP<span class="tab-count">(500)</span></div>
+                        <div class="tab-item">PC<span class="tab-count">(30)</span></div>
+                    </div>
+                </div>
+
+                <!-- ===== Table Toolbar ===== -->
+                <div class="table-toolbar">
+                    <div class="toolbar-left">
+                        <button class="btn btn-default">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            导出
+                        </button>
+                        <button class="btn btn-primary">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            添加用户
+                        </button>
+                        <div class="selection-alert">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            已选择 2 项
+                        </div>
+                    </div>
+                    <div class="toolbar-right"></div>
+                </div>
+
+                <!-- ===== Data Table ===== -->
+                <div class="table-card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width:40px;text-align:center"><span class="el-checkbox"></span></th>
+                                <th>用户信息</th>
+                                <th>用户等级</th>
+                                <th>手机号</th>
+                                <th>注册来源</th>
+                                <th>余额</th>
+                                <th>邀请码</th>
+                                <th>身份</th>
+                                <th>账户状态</th>
+                                <th>禁言状态</th>
+                                <th>
+                                    <span class="sort-header">
+                                        创建时间
+                                        <span class="sort-arrow">
+                                            <span class="arrow-up"></span>
+                                            <span class="arrow-down"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Row 1 -->
+                            <tr>
+                                <td style="text-align:center"><span class="el-checkbox checked"></span></td>
+                                <td>
+                                    <div class="user-info-cell">
+                                        <div class="user-avatar color-1">小</div>
+                                        <div class="user-detail">
+                                            <span class="user-nickname">小明同学</span>
+                                            <span class="user-id">U20260001</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="level-badge lv3">Lv3</span></td>
+                                <td>138****1234</td>
+                                <td><span class="source-text">微信小程序</span></td>
+                                <td><span class="balance-text">¥1,256.78</span></td>
+                                <td>ABC123</td>
+                                <td><span class="tag tag-green">用户</span></td>
+                                <td><span class="tag tag-green">正常</span></td>
+                                <td><span class="tag tag-green">正常</span></td>
+                                <td style="white-space:nowrap">2026-06-06 11:37:07</td>
+                                <td>
+                                    <div class="operation-links">
+                                        <a class="op-link" href="#">详情</a>
+                                        <a class="op-link op-link-more" href="#">更多
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 2 -->
+                            <tr>
+                                <td style="text-align:center"><span class="el-checkbox checked"></span></td>
+                                <td>
+                                    <div class="user-info-cell">
+                                        <div class="user-avatar color-2">美</div>
+                                        <div class="user-detail">
+                                            <span class="user-nickname">美食达人</span>
+                                            <span class="user-id">U20260002</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="level-badge lv5">Lv5</span></td>
+                                <td>139****5678</td>
+                                <td><span class="source-text">APP</span></td>
+                                <td><span class="balance-text">¥5,890.00</span></td>
+                                <td>DEF456</td>
+                                <td><span class="tag tag-pink">主播</span></td>
+                                <td><span class="tag tag-green">正常</span></td>
+                                <td><span class="tag tag-orange">临时禁言</span></td>
+                                <td style="white-space:nowrap">2026-06-05 09:23:45</td>
+                                <td>
+                                    <div class="operation-links">
+                                        <a class="op-link" href="#">详情</a>
+                                        <a class="op-link op-link-more" href="#">更多
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 3 -->
+                            <tr>
+                                <td style="text-align:center"><span class="el-checkbox"></span></td>
+                                <td>
+                                    <div class="user-info-cell">
+                                        <div class="user-avatar color-3">运</div>
+                                        <div class="user-detail">
+                                            <span class="user-nickname">运动健将</span>
+                                            <span class="user-id">U20260003</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="level-badge lv2">Lv2</span></td>
+                                <td>137****9012</td>
+                                <td><span class="source-text">H5</span></td>
+                                <td><span class="balance-text">¥320.50</span></td>
+                                <td>-</td>
+                                <td><span class="tag tag-green">用户</span></td>
+                                <td><span class="tag tag-orange">禁用</span></td>
+                                <td><span class="tag tag-green">正常</span></td>
+                                <td style="white-space:nowrap">2026-06-04 14:56:12</td>
+                                <td>
+                                    <div class="operation-links">
+                                        <a class="op-link" href="#">详情</a>
+                                        <a class="op-link op-link-more" href="#">更多
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 4 -->
+                            <tr>
+                                <td style="text-align:center"><span class="el-checkbox"></span></td>
+                                <td>
+                                    <div class="user-info-cell">
+                                        <div class="user-avatar color-4">美</div>
+                                        <div class="user-detail">
+                                            <span class="user-nickname">美妆博主</span>
+                                            <span class="user-id">U20260004</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="level-badge lv4">Lv4</span></td>
+                                <td>136****3456</td>
+                                <td><span class="source-text">微信公众号</span></td>
+                                <td><span class="balance-text">¥12,345.67</span></td>
+                                <td>GHI789</td>
+                                <td><span class="tag tag-pink">主播</span></td>
+                                <td><span class="tag tag-green">正常</span></td>
+                                <td><span class="tag tag-red">永久禁言</span></td>
+                                <td style="white-space:nowrap">2026-06-03 16:28:33</td>
+                                <td>
+                                    <div class="operation-links">
+                                        <a class="op-link" href="#">详情</a>
+                                        <a class="op-link op-link-more" href="#">更多
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 5 -->
+                            <tr>
+                                <td style="text-align:center"><span class="el-checkbox"></span></td>
+                                <td>
+                                    <div class="user-info-cell">
+                                        <div class="user-avatar color-5">旅</div>
+                                        <div class="user-detail">
+                                            <span class="user-nickname">旅行家</span>
+                                            <span class="user-id">U20260005</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="level-badge lv1">Lv1</span></td>
+                                <td>135****7890</td>
+                                <td><span class="source-text">PC</span></td>
+                                <td><span class="balance-text">¥89.99</span></td>
+                                <td>JKL012</td>
+                                <td><span class="tag tag-green">用户</span></td>
+                                <td><span class="tag tag-gray">注销</span></td>
+                                <td><span class="tag tag-green">正常</span></td>
+                                <td style="white-space:nowrap">2026-06-02 10:15:47</td>
+                                <td>
+                                    <div class="operation-links">
+                                        <a class="op-link" href="#">详情</a>
+                                        <a class="op-link op-link-more" href="#">更多
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 6 -->
+                            <tr>
+                                <td style="text-align:center"><span class="el-checkbox"></span></td>
+                                <td>
+                                    <div class="user-info-cell">
+                                        <div class="user-avatar color-6">音</div>
+                                        <div class="user-detail">
+                                            <span class="user-nickname">音乐爱好者</span>
+                                            <span class="user-id">U20260006</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="level-badge lv3">Lv3</span></td>
+                                <td>134****2345</td>
+                                <td><span class="source-text">微信小程序</span></td>
+                                <td><span class="balance-text">¥678.00</span></td>
+                                <td>-</td>
+                                <td><span class="tag tag-green">用户</span></td>
+                                <td><span class="tag tag-green">正常</span></td>
+                                <td><span class="tag tag-green">正常</span></td>
+                                <td style="white-space:nowrap">2026-06-01 08:42:19</td>
+                                <td>
+                                    <div class="operation-links">
+                                        <a class="op-link" href="#">详情</a>
+                                        <a class="op-link op-link-more" href="#">更多
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 7 -->
+                            <tr>
+                                <td style="text-align:center"><span class="el-checkbox"></span></td>
+                                <td>
+                                    <div class="user-info-cell">
+                                        <div class="user-avatar color-7">游</div>
+                                        <div class="user-detail">
+                                            <span class="user-nickname">游戏主播</span>
+                                            <span class="user-id">U20260007</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="level-badge lv5">Lv5</span></td>
+                                <td>133****6789</td>
+                                <td><span class="source-text">APP</span></td>
+                                <td><span class="balance-text">¥88,888.88</span></td>
+                                <td>MNO345</td>
+                                <td><span class="tag tag-pink">主播</span></td>
+                                <td><span class="tag tag-green">正常</span></td>
+                                <td><span class="tag tag-green">正常</span></td>
+                                <td style="white-space:nowrap">2026-05-31 19:30:55</td>
+                                <td>
+                                    <div class="operation-links">
+                                        <a class="op-link" href="#">详情</a>
+                                        <a class="op-link op-link-more" href="#">更多
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Row 8 -->
+                            <tr>
+                                <td style="text-align:center"><span class="el-checkbox"></span></td>
+                                <td>
+                                    <div class="user-info-cell">
+                                        <div class="user-avatar color-8">读</div>
+                                        <div class="user-detail">
+                                            <span class="user-nickname">读书达人</span>
+                                            <span class="user-id">U20260008</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="level-badge lv2">Lv2</span></td>
+                                <td>132****0123</td>
+                                <td><span class="source-text">H5</span></td>
+                                <td><span class="balance-text">¥450.00</span></td>
+                                <td>PQR678</td>
+                                <td><span class="tag tag-green">用户</span></td>
+                                <td><span class="tag tag-green">正常</span></td>
+                                <td><span class="tag tag-orange">临时禁言</span></td>
+                                <td style="white-space:nowrap">2026-05-30 11:22:33</td>
+                                <td>
+                                    <div class="operation-links">
+                                        <a class="op-link" href="#">详情</a>
+                                        <a class="op-link op-link-more" href="#">更多
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ===== Pagination ===== -->
+                <div class="pagination-card">
+                    <span class="pagination-total">共 1730 条</span>
+                    <div class="pagination-sizes">
+                        <select>
+                            <option>10条/页</option>
+                            <option>20条/页</option>
+                            <option>50条/页</option>
+                            <option>100条/页</option>
+                        </select>
+                    </div>
+                    <div class="pagination-list">
+                        <button class="page-btn disabled">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        </button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <span class="page-ellipsis">...</span>
+                        <button class="page-btn">174</button>
+                        <button class="page-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <style>
+    /* ==================== LAYOUT ==================== */
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+      width: 1440px;
+      margin: 0 auto;
+    }
+
+    /* ==================== SIDEBAR ==================== */
+    .sidebar {
+      width: var(--sidebar-width);
+      min-width: var(--sidebar-width);
+      background: var(--color-bg-sidebar);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      z-index: 100;
+    }
+
+    .sidebar-logo {
+      height: 50px;
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-lg);
+      background: var(--color-bg-sidebar-dark);
+      gap: var(--space-sm);
+    }
+
+    .sidebar-logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--color-primary);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-lg);
+      flex-shrink: 0;
+    }
+
+    .sidebar-logo-text {
+      color: #fff;
+      font-size: var(--font-size-md);
+      font-weight: var(--font-weight-semibold);
+      white-space: nowrap;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: var(--space-xs) 0;
+    }
+
+    .sidebar-menu-item {
+      position: relative;
+    }
+
+    .sidebar-menu-item-title {
+      display: flex;
+      align-items: center;
+      height: 46px;
+      padding: 0 var(--space-lg);
+      color: rgba(255, 255, 255, 0.65);
+      font-size: var(--font-size-base);
+      cursor: pointer;
+      transition: all 0.2s;
+      gap: var(--space-sm);
+      text-decoration: none;
+    }
+
+    .sidebar-menu-item-title:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+    }
+
+    .sidebar-menu-item-title .menu-icon {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sidebar-menu-item-title .menu-icon svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .sidebar-menu-item-title .menu-arrow {
+      margin-left: auto;
+      width: 14px;
+      height: 14px;
+      transition: transform 0.3s;
+      opacity: 0.5;
+    }
+
+    .sidebar-menu-item-title .menu-arrow svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .sidebar-menu-item.expanded > .sidebar-menu-item-title .menu-arrow {
+      transform: rotate(90deg);
+    }
+
+    .sidebar-menu-item.expanded > .sidebar-menu-item-title {
+      color: #fff;
+    }
+
+    .sidebar-submenu {
+      list-style: none;
+      display: none;
+      background: var(--color-bg-sidebar-dark);
+    }
+
+    .sidebar-menu-item.expanded > .sidebar-submenu {
+      display: block;
+    }
+
+    .sidebar-submenu-item {
+      display: block;
+      height: 42px;
+      line-height: 42px;
+      padding-left: 52px;
+      color: rgba(255, 255, 255, 0.65);
+      font-size: var(--font-size-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      position: relative;
+    }
+
+    .sidebar-submenu-item:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .sidebar-submenu-item.active {
+      color: #fff;
+      background: var(--color-primary);
+    }
+
+    /* ==================== MAIN AREA ==================== */
+    .main-area {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ==================== HEADER ==================== */
+    .admin-header {
+      height: var(--header-height);
+      background: var(--color-bg-header);
+      border-bottom: 1px solid var(--color-border-lighter);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 var(--space-xl);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-secondary);
+    }
+
+    .breadcrumb a {
+      color: var(--color-text-secondary);
+    }
+
+    .breadcrumb a:hover {
+      color: var(--color-primary);
+    }
+
+    .breadcrumb .separator {
+      color: var(--color-text-placeholder);
+    }
+
+    .breadcrumb .current {
+      color: var(--color-text-primary);
+      font-weight: var(--font-weight-medium);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-lg);
+    }
+
+    .header-icon-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-round);
+      color: var(--color-text-regular);
+      cursor: pointer;
+      transition: background 0.2s;
+      position: relative;
+    }
+
+    .header-icon-btn:hover {
+      background: var(--color-bg-hover);
+    }
+
+    .header-icon-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .header-badge {
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 8px;
+      height: 8px;
+      background: var(--state-error);
+      border-radius: var(--radius-round);
+      border: 2px solid #fff;
+    }
+
+    .header-avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: var(--radius-round);
+      background: var(--color-primary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      cursor: pointer;
+    }
+
+    /* ==================== CONTENT AREA ==================== */
+    .content-area {
+      flex: 1;
+      padding: var(--space-lg);
+      overflow-x: auto;
+    }
+
+    /* ==================== FILTER CARD ==================== */
+    .filter-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-lighter);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      padding: var(--space-lg) var(--space-xl);
+      margin-bottom: var(--space-base);
+    }
+
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-base) var(--space-lg);
+      margin-bottom: var(--space-base);
+    }
+
+    .filter-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .filter-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-regular);
+      white-space: nowrap;
+      font-weight: var(--font-weight-medium);
+    }
+
+    .filter-input {
+      width: 200px;
+      height: 32px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 0 var(--space-md);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: var(--font-family);
+      background: #fff;
+    }
+
+    .filter-input::placeholder {
+      color: var(--color-text-placeholder);
+    }
+
+    .filter-input:focus {
+      border-color: var(--color-primary);
+    }
+
+    .filter-select {
+      width: 130px;
+      height: 32px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 0 var(--space-sm);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23C0C4CC' d='M2.5 4.5L6 8l3.5-3.5'/%3E%3C/svg%3E") no-repeat right 10px center;
+      padding-right: 28px;
+      font-family: var(--font-family);
+      transition: border-color 0.2s;
+    }
+
+    .filter-select:focus {
+      border-color: var(--color-primary);
+    }
+
+    .filter-date-range {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .filter-date-range .date-sep {
+      color: var(--color-text-placeholder);
+      font-size: var(--font-size-sm);
+    }
+
+    .filter-date {
+      width: 150px;
+      height: 32px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 0 var(--space-sm);
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+      outline: none;
+      font-family: var(--font-family);
+      transition: border-color 0.2s;
+    }
+
+    .filter-date:focus {
+      border-color: var(--color-primary);
+    }
+
+    .filter-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-left: auto;
+    }
+
+    .btn {
+      height: 32px;
+      padding: 0 var(--space-base);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      font-family: var(--font-family);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      transition: all 0.2s;
+      white-space: nowrap;
+      font-weight: var(--font-weight-medium);
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--color-primary-light);
+      border-color: var(--color-primary-light);
+    }
+
+    .btn-default {
+      background: #fff;
+      color: var(--color-text-regular);
+    }
+
+    .btn-default:hover {
+      color: var(--color-primary);
+      border-color: var(--color-primary);
+      background: var(--color-primary-lightest);
+    }
+
+    .btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ==================== TAB NAVIGATION ==================== */
+    .tab-nav {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-lighter);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      padding: 0 var(--space-xl);
+      margin-bottom: var(--space-base);
+    }
+
+    .tab-nav-inner {
+      display: flex;
+      border-bottom: 1px solid var(--color-border-lighter);
+    }
+
+    .tab-item {
+      height: 42px;
+      line-height: 42px;
+      padding: 0 var(--space-lg);
+      font-size: var(--font-size-base);
+      color: var(--color-text-regular);
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s;
+      white-space: nowrap;
+      font-weight: var(--font-weight-medium);
+    }
+
+    .tab-item:hover {
+      color: var(--color-primary);
+    }
+
+    .tab-item.active {
+      color: var(--color-primary);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .tab-item.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: var(--space-lg);
+      right: var(--space-lg);
+      height: 2px;
+      background: var(--color-primary);
+      border-radius: 1px;
+    }
+
+    .tab-count {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-placeholder);
+      margin-left: var(--space-xs);
+    }
+
+    .tab-item.active .tab-count {
+      color: var(--color-primary);
+    }
+
+    /* ==================== TABLE TOOLBAR ==================== */
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-base);
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+    }
+
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .selection-alert {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: 6px var(--space-md);
+      background: var(--color-primary-lightest);
+      border: 1px solid var(--color-primary-lighter);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      color: var(--color-primary);
+      margin-left: var(--space-sm);
+    }
+
+    .selection-alert svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+
+    /* ==================== DATA TABLE ==================== */
+    .table-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-lighter);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+      margin-bottom: var(--space-base);
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--font-size-sm);
+    }
+
+    .data-table thead th {
+      background: #F5F7FA;
+      color: var(--color-text-regular);
+      font-weight: var(--font-weight-medium);
+      padding: var(--space-md) var(--space-base);
+      border-bottom: 1px solid var(--color-border-lighter);
+      border-right: 1px solid var(--color-border-lighter);
+      text-align: left;
+      white-space: nowrap;
+      font-size: var(--font-size-sm);
+      height: 46px;
+    }
+
+    .data-table thead th:last-child {
+      border-right: none;
+    }
+
+    .data-table tbody td {
+      padding: var(--space-md) var(--space-base);
+      border-bottom: 1px solid var(--color-border-lighter);
+      border-right: 1px solid var(--color-border-lighter);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
+      vertical-align: middle;
+    }
+
+    .data-table tbody td:last-child {
+      border-right: none;
+    }
+
+    .data-table tbody tr:hover {
+      background: var(--color-bg-hover);
+    }
+
+    .data-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Checkbox */
+    .el-checkbox {
+      width: 16px;
+      height: 16px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      background: #fff;
+      vertical-align: middle;
+    }
+
+    .el-checkbox.checked {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+
+    .el-checkbox.checked::after {
+      content: '';
+      width: 4px;
+      height: 8px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translate(-1px, -1px);
+    }
+
+    /* User info cell */
+    .user-info-cell {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-round);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      flex-shrink: 0;
+    }
+
+    .user-avatar.color-1 { background: #409EFF; }
+    .user-avatar.color-2 { background: #E6A23C; }
+    .user-avatar.color-3 { background: #67C23A; }
+    .user-avatar.color-4 { background: #F56C6C; }
+    .user-avatar.color-5 { background: #909399; }
+    .user-avatar.color-6 { background: #36CFC9; }
+    .user-avatar.color-7 { background: #722ED1; }
+    .user-avatar.color-8 { background: #FA8C16; }
+
+    .user-detail {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .user-nickname {
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
+    }
+
+    .user-id {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+    }
+
+    /* Level badge */
+    .level-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: 10px;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .level-badge.lv1 {
+      background: linear-gradient(135deg, #909399, #B1B3B8);
+    }
+
+    .level-badge.lv2 {
+      background: linear-gradient(135deg, #67C23A, #85CE61);
+    }
+
+    .level-badge.lv3 {
+      background: linear-gradient(135deg, #409EFF, #66B1FF);
+    }
+
+    .level-badge.lv4 {
+      background: linear-gradient(135deg, #E6A23C, #EBB563);
+    }
+
+    .level-badge.lv5 {
+      background: linear-gradient(135deg, #F56C6C, #F78989);
+    }
+
+    /* Tags */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      white-space: nowrap;
+      line-height: 1.6;
+    }
+
+    .tag-green {
+      background: var(--state-success-lighter);
+      color: var(--state-success);
+      border: 1px solid var(--state-success-light);
+    }
+
+    .tag-pink {
+      background: #FDF2F8;
+      color: #E91E8C;
+      border: 1px solid #F9D4EB;
+    }
+
+    .tag-orange {
+      background: var(--state-warning-lighter);
+      color: var(--state-warning);
+      border: 1px solid var(--state-warning-light);
+    }
+
+    .tag-red {
+      background: var(--state-error-lighter);
+      color: var(--state-error);
+      border: 1px solid var(--state-error-light);
+    }
+
+    .tag-gray {
+      background: var(--state-info-lighter);
+      color: var(--state-info);
+      border: 1px solid var(--state-info-light);
+    }
+
+    /* Balance */
+    .balance-text {
+      color: var(--state-warning);
+      font-weight: var(--font-weight-bold);
+      font-size: var(--font-size-sm);
+    }
+
+    /* Operation links */
+    .operation-links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-base);
+    }
+
+    .op-link {
+      font-size: var(--font-size-sm);
+      color: var(--color-primary);
+      cursor: pointer;
+      white-space: nowrap;
+      font-weight: var(--font-weight-medium);
+    }
+
+    .op-link:hover {
+      color: var(--color-primary-light);
+      text-decoration: underline;
+    }
+
+    .op-link-more {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .op-link-more svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* Sort arrow */
+    .sort-header {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .sort-arrow {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 0;
+      width: 10px;
+      height: 14px;
+    }
+
+    .sort-arrow .arrow-up,
+    .sort-arrow .arrow-down {
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+    }
+
+    .sort-arrow .arrow-up {
+      border-bottom: 5px solid var(--color-text-placeholder);
+    }
+
+    .sort-arrow .arrow-down {
+      border-top: 5px solid var(--color-text-placeholder);
+    }
+
+    /* ==================== PAGINATION ==================== */
+    .pagination-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border-lighter);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      padding: var(--space-base) var(--space-xl);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: var(--space-sm);
+    }
+
+    .pagination-total {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-regular);
+      margin-right: var(--space-sm);
+    }
+
+    .pagination-sizes {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+      margin-right: var(--space-sm);
+    }
+
+    .pagination-sizes select {
+      height: 28px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 0 var(--space-sm);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
+      outline: none;
+      font-family: var(--font-family);
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%23C0C4CC' d='M1.5 3.5L5 7l3.5-3.5'/%3E%3C/svg%3E") no-repeat right 6px center;
+      padding-right: 22px;
+    }
+
+    .pagination-list {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+
+    .page-btn {
+      min-width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-primary);
+      background: #fff;
+      cursor: pointer;
+      padding: 0 6px;
+      font-family: var(--font-family);
+      transition: all 0.2s;
+    }
+
+    .page-btn:hover {
+      color: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+
+    .page-btn.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #fff;
+    }
+
+    .page-btn.disabled {
+      color: var(--color-text-placeholder);
+      cursor: not-allowed;
+      border-color: var(--color-border);
+    }
+
+    .page-btn svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    .page-ellipsis {
+      min-width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+    }
+
+    /* Source channel text */
+    .source-text {
+      font-size: var(--font-size-sm);
+      color: var(--color-text-regular);
+    }
+    </style>
+</body>
+</html>
