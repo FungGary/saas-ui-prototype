@@ -2,193 +2,186 @@
   <el-dialog
     :visible.sync="visible"
     title="截图审核"
-    width="900px"
+    width="760px"
     :close-on-click-modal="false"
-    center
     class="review-audit-dialog"
     @closed="handleClosed"
   >
     <div v-if="currentRow" class="audit-content">
-      <!-- ========== 多媒体展示区：规则图 + 视频 双栏对比 ========== -->
-      <div class="media-compare-section">
-        <div class="section-title">规则对比</div>
-        <div class="media-compare-wrapper">
-          <!-- 左侧：游戏规则图 -->
-          <div class="media-col">
-            <div class="media-col-header">
-              <i class="el-icon-document"></i>
-              <span>游戏规则图</span>
-            </div>
-            <div class="media-card rule-card">
-              <img :src="ruleImageUrl" class="media-img" alt="游戏规则图" />
-            </div>
+      <!-- 审核信息 -->
+      <el-card :bordered="false" shadow="never" class="info-card" :body-style="{ padding: '16px 20px' }">
+        <div slot="header" class="card-header">
+          <i class="el-icon-info card-icon"></i>
+          <span class="card-title">审核信息</span>
+        </div>
+        <div class="rule-label">规则详情</div>
+        <div class="media-row">
+          <div class="media-item">
+            <img :src="ruleImageUrl" class="media-img" />
           </div>
-
-          <!-- VS 分隔符 -->
-          <div class="vs-divider">
-            <span>VS</span>
-          </div>
-
-          <!-- 右侧：用户抓取回放视频 -->
-          <div class="media-col">
-            <div class="media-col-header">
+          <div class="media-item video-item">
+            <video
+              v-if="currentRow.videoUrl"
+              ref="reviewVideoPlayer"
+              :src="currentRow.videoUrl"
+              controls
+              class="review-video"
+              preload="metadata"
+            >
+              您的浏览器不支持视频播放
+            </video>
+            <div v-else class="video-placeholder">
               <i class="el-icon-video-camera"></i>
-              <span>抓取回放视频</span>
-            </div>
-            <div class="media-card video-card">
-              <video
-                v-if="currentRow.videoUrl"
-                ref="reviewVideoPlayer"
-                :src="currentRow.videoUrl"
-                controls
-                class="review-video"
-                preload="metadata"
-              >
-                您的浏览器不支持视频播放
-              </video>
-              <div v-else class="video-placeholder">
-                <i class="el-icon-video-pause"></i>
-                <span>暂无视频</span>
-              </div>
+              <span>暂无视频</span>
             </div>
           </div>
         </div>
-      </div>
+      </el-card>
 
-      <el-divider></el-divider>
-
-      <!-- ========== 审核操作区 ========== -->
-      <div class="audit-section">
-        <div class="section-title">审核操作</div>
-
-        <!-- 审核状态 -->
-        <div class="audit-status-row">
-          <span class="status-label">
-            审核状态：
-            <annotation-point
-              title="【优化】审核二次确认机制"
-              content="优化前：点确定可能直接通过并发奖，无二次确认，容易误操作。&#10;&#10;优化后：审核通过和驳回答都增加二次确认弹窗：&#10;· 通过时弹窗：'将通过审核，将发放X件奖品给该用户，是否确认？'&#10;· 驳回时弹窗：'驳回审核，用户权益将不发放，驳回原因：xxx，是否确认？'&#10;&#10;原因：防止误审通过造成奖品损失，防止误驳回影响用户体验，增加操作安全性和审核严谨性。"
-              priority="P0"
-            />
-          </span>
-          <el-radio-group v-model="auditForm.auditResult">
-            <el-radio label="pass">通过</el-radio>
-            <el-radio label="reject">驳回</el-radio>
+      <!-- 审核状态 -->
+      <el-card :bordered="false" shadow="never" class="status-card" :body-style="{ padding: '16px 20px' }">
+        <div slot="header" class="card-header">
+          <i class="el-icon-circle-check card-icon"></i>
+          <span class="card-title">审核状态</span>
+        </div>
+        <div class="audit-status-section">
+          <el-radio-group v-model="auditForm.auditResult" class="audit-radio-group">
+            <el-radio label="pass" class="audit-radio pass">
+              <span class="radio-text">通过</span>
+            </el-radio>
+            <el-radio label="reject" class="audit-radio reject">
+              <span class="radio-text">不通过</span>
+            </el-radio>
           </el-radio-group>
         </div>
 
-        <!-- 驳回原因（仅驳回时显示） -->
-        <div v-if="auditForm.auditResult === 'reject'" class="reject-reason-section">
-          <span class="reason-label">驳回原因：</span>
+        <!-- 驳回原因（仅不通过时显示） -->
+        <div v-if="auditForm.auditResult === 'reject'" class="reject-section">
+          <span class="reject-label">驳回原因</span>
           <el-input
             v-model="auditForm.rejectReason"
             type="textarea"
             :rows="3"
             placeholder="请输入驳回原因"
-            class="reject-reason-input"
+            maxlength="50"
+            show-word-limit
+            class="reject-textarea"
           ></el-input>
         </div>
+      </el-card>
 
-        <!-- 奖品类型与配置（仅通过时显示） -->
-        <div v-if="auditForm.auditResult === 'pass'">
-          <el-form-item label="奖品类型" label-width="100px" class="audit-form-item">
-            <el-radio-group v-model="auditForm.prizeType">
-              <el-radio label="physical">实物奖品</el-radio>
-              <el-radio label="points">积分</el-radio>
-            </el-radio-group>
-          </el-form-item>
+      <!-- 奖品信息（仅通过时显示） -->
+      <el-card
+        v-if="auditForm.auditResult === 'pass'"
+        :bordered="false"
+        shadow="never"
+        class="prize-card"
+        :body-style="{ padding: '16px 20px' }"
+      >
+        <div slot="header" class="card-header">
+          <i class="el-icon-present card-icon"></i>
+          <span class="card-title">奖品信息</span>
+        </div>
 
-          <!-- 礼品倍数说明 -->
-          <div class="multiple-tip">
-            <i class="el-icon-info"></i>
-            <span>礼品倍数说明：根据投币倍数或玩法规则计算最终奖品数量</span>
-            <annotation-point
-              title="【优化】礼品倍数说明"
-              content="优化前：表格有礼品倍数，但对审核员不够直观，不清楚倍数含义和计算方式。&#10;&#10;优化后：在奖品配置表格上方增加'礼品倍数说明'提示，明确说明：根据投币倍数或玩法规则计算最终奖品数量。&#10;&#10;原因：让审核员更清晰理解礼品倍数的含义和计算逻辑，减少审核误操作，提升审核准确性和效率。"
-              priority="P0"
-            />
-          </div>
+        <div class="prize-type-section">
+          <el-radio-group v-model="auditForm.prizeType" class="prize-type-group">
+            <el-radio label="physical" class="prize-radio">
+              <span class="radio-text">实物奖品</span>
+            </el-radio>
+            <el-radio label="points" class="prize-radio">
+              <span class="radio-text">积分</span>
+            </el-radio>
+          </el-radio-group>
+        </div>
 
-          <!-- 动态奖品配置表格 -->
-          <div class="prize-table-wrapper">
-            <el-table :data="auditForm.prizeList" border size="small">
-              <!-- 选择奖品 -->
-              <el-table-column label="选择奖品" min-width="200">
-                <template slot-scope="scope">
-                  <el-select
-                    v-model="scope.row.prizeId"
-                    placeholder="选择奖品"
-                    clearable
-                    size="small"
-                    @change="handlePrizeChange(scope.row)"
-                  >
-                    <el-option
-                      v-for="prize in prizeOptions"
-                      :key="prize.id"
-                      :label="prize.name"
-                      :value="prize.id"
-                    ></el-option>
-                  </el-select>
-                </template>
-              </el-table-column>
+        <!-- 倍数说明 -->
+        <div class="multiple-tip">
+          <i class="el-icon-info"></i>
+          <span>倍数说明：根据投币倍数或玩法规则计算最终奖品数</span>
+        </div>
 
-              <!-- 数量 -->
-              <el-table-column label="数量" width="120">
-                <template slot-scope="scope">
-                  <el-input-number
-                    v-model="scope.row.quantity"
-                    :min="1"
-                    :max="999"
-                    size="small"
-                    @change="calculateTotal(scope.row)"
-                  ></el-input-number>
-                </template>
-              </el-table-column>
+        <!-- 实物奖品表格 -->
+        <div v-if="auditForm.prizeType === 'physical'" class="prize-table-wrapper">
+          <el-table :data="auditForm.prizeList" border size="small" class="prize-table">
+            <el-table-column label="奖品" min-width="180">
+              <template slot-scope="scope">
+                <div class="prize-info" v-if="scope.row.prizeId">
+                  <img :src="getPrizeImage(scope.row.prizeId)" class="prize-thumb" />
+                  <div class="prize-detail">
+                    <div class="prize-name">{{ scope.row.prizeName }}</div>
+                    <div class="prize-id">商品ID: {{ scope.row.prizeId }}</div>
+                  </div>
+                </div>
+                <span v-else class="text-gray">选择奖品</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="数量" width="100">
+              <template slot-scope="scope">
+                <el-input
+                  v-model="scope.row.quantity"
+                  size="small"
+                  type="number"
+                  min="1"
+                  @change="calculateTotal(scope.row)"
+                ></el-input>
+              </template>
+            </el-table-column>
+            <el-table-column label="倍数" width="80" align="center">
+              <template slot-scope="scope">
+                <span class="multiple-tag">x{{ scope.row.multiple }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="礼品总数" width="100" align="center">
+              <template slot-scope="scope">
+                <span class="total-text">{{ scope.row.total }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="70" align="center">
+              <template slot-scope="scope">
+                <i
+                  class="el-icon-delete delete-icon"
+                  @click="handleDeletePrize(scope.$index)"
+                ></i>
+              </template>
+            </el-table-column>
+          </el-table>
 
-              <!-- 礼品倍数（只读） -->
-              <el-table-column label="礼品倍数" width="100" align="center">
-                <template slot-scope="scope">
-                  <el-tag size="small" type="info">{{ scope.row.multiple }}x</el-tag>
-                </template>
-              </el-table-column>
-
-              <!-- 礼品总数（计算结果，只读） -->
-              <el-table-column label="礼品总数" width="100" align="center">
-                <template slot-scope="scope">
-                  <span class="total-num">{{ scope.row.total }}</span>
-                </template>
-              </el-table-column>
-
-              <!-- 操作：删除 -->
-              <el-table-column label="操作" width="70" align="center">
-                <template slot-scope="scope">
-                  <i
-                    class="el-icon-delete delete-icon"
-                    @click="handleDeletePrize(scope.$index)"
-                    v-if="auditForm.prizeList.length > 1"
-                  ></i>
-                </template>
-              </el-table-column>
-            </el-table>
-
-            <!-- 添加奖品项按钮 -->
-            <div class="add-prize-row">
-              <el-button type="primary" icon="el-icon-plus" size="small" @click="handleAddPrize">
-                添加奖品项
-              </el-button>
-            </div>
-          </div>
-
-          <!-- 奖品汇总 -->
-          <div class="prize-summary">
-            <span class="summary-label">预计发放：</span>
-            <span class="summary-value">{{ totalPrizeText }}</span>
+          <!-- 添加奖品 -->
+          <div class="prize-actions">
+            <el-button type="primary" size="small" @click="handleAddPrize">添加奖品</el-button>
           </div>
         </div>
-      </div>
+
+        <!-- 积分奖品 -->
+        <div v-if="auditForm.prizeType === 'points'" class="points-form">
+          <el-table :data="pointsFormList" border size="small" class="prize-table">
+            <el-table-column label="积分数量" width="160">
+              <template slot-scope="scope">
+                <el-input
+                  v-model="scope.row.quantity"
+                  size="small"
+                  type="number"
+                  min="0"
+                  @change="calculatePointsTotal(scope.row)"
+                ></el-input>
+              </template>
+            </el-table-column>
+            <el-table-column label="倍数" width="80" align="center">
+              <template slot-scope="scope">
+                <span class="multiple-tag">x{{ scope.row.multiple }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="积分总数" width="120" align="center">
+              <template slot-scope="scope">
+                <span class="total-text">{{ scope.row.total }}</span>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </el-card>
     </div>
 
-    <!-- 底部按钮：取消、确定 -->
+    <!-- 底部按钮 -->
     <span slot="footer" class="dialog-footer">
       <el-button @click="handleCancel">取消</el-button>
       <el-button type="primary" @click="handleConfirm">确定</el-button>
@@ -197,31 +190,19 @@
 </template>
 
 <script>
-import AnnotationPoint from '@/components/AnnotationPoint';
-
 export default {
   name: 'ReviewAuditDialog',
-  components: {
-    AnnotationPoint,
-  },
   data() {
     return {
       visible: false,
       currentRow: null,
-
-      // 游戏规则图URL
       ruleImageUrl: 'https://img.yzcdn.cn/vant/cat.jpeg',
-
-      // 奖品选项
       prizeOptions: [
-        { id: 1, name: '毛绒玩具熊', stock: 100 },
-        { id: 2, name: '精美礼品一份', stock: 50 },
-        { id: 3, name: '钥匙扣', stock: 200 },
-        { id: 4, name: '定制周边大礼包', stock: 30 },
-        { id: 5, name: '纪念徽章', stock: 150 },
+        { id: 1, name: 'LEOBOG GM5无线品', image: 'https://img.yzcdn.cn/vant/cat.jpeg' },
+        { id: 2, name: '毛绒玩具熊', image: 'https://img.yzcdn.cn/vant/cat.jpeg' },
+        { id: 3, name: '精美钥匙扣套装', image: 'https://img.yzcdn.cn/vant/cat.jpeg' },
+        { id: 4, name: '限定手办', image: 'https://img.yzcdn.cn/vant/cat.jpeg' },
       ],
-
-      // 审核表单数据
       auditForm: {
         auditResult: 'pass',
         prizeType: 'physical',
@@ -231,74 +212,51 @@ export default {
     };
   },
   computed: {
-    // 投币倍数
     coinMultiple() {
       return this.currentRow?.coinMultiple || 1;
     },
-
-    // 奖品总数文本
-    totalPrizeText() {
-      if (this.auditForm.auditResult !== 'pass') return '-';
-      const totalItems = this.auditForm.prizeList.reduce(
-        (sum, item) => sum + (item.total || 0),
-        0
-      );
-      if (this.auditForm.prizeType === 'points') {
-        return `${totalItems} 积分`;
-      }
-      return `${totalItems} 件奖品`;
+    pointsFormList() {
+      return [{
+        quantity: 0,
+        multiple: this.coinMultiple,
+        total: 0,
+      }];
     },
   },
   methods: {
-    /**
-     * 打开审核弹窗
-     * @param {Object} row 当前行数据
-     */
     open(row) {
       this.currentRow = row;
       this.visible = true;
-      this.resetForm(row);
-
-      // 设置规则图（根据房间/玩法不同可切换）
       this.ruleImageUrl = row.ruleImageUrl || 'https://img.yzcdn.cn/vant/cat.jpeg';
-
-      // 弹窗打开后视频可以手动播放
+      this.resetForm(row);
       this.$nextTick(() => {
         if (this.$refs.reviewVideoPlayer) {
           this.$refs.reviewVideoPlayer.load();
         }
       });
     },
-
-    /**
-     * 重置表单
-     * @param {Object} row 当前行数据
-     */
     resetForm(row) {
-      // 如果原有奖品数据则复用，否则初始化2条预设数据
       let initPrizeList = [];
       if (row?.prizeList && row.prizeList.length > 0) {
         initPrizeList = JSON.parse(JSON.stringify(row.prizeList));
       } else {
-        // 预设2条数据以展示效果
         initPrizeList = [
           {
             prizeId: 1,
-            prizeName: '毛绒玩具熊',
+            prizeName: 'LEOBOG GM5无线品',
             quantity: 1,
             multiple: this.coinMultiple,
             total: this.coinMultiple,
           },
           {
-            prizeId: 3,
-            prizeName: '钥匙扣',
-            quantity: 2,
+            prizeId: '',
+            prizeName: '',
+            quantity: 1,
             multiple: this.coinMultiple,
-            total: 2 * this.coinMultiple,
+            total: this.coinMultiple,
           },
         ];
       }
-
       this.auditForm = {
         auditResult: 'pass',
         prizeType: 'physical',
@@ -306,142 +264,55 @@ export default {
         rejectReason: '',
       };
     },
-
-    /**
-     * 奖品选择变化
-     * @param {Object} row 当前行
-     */
-    handlePrizeChange(row) {
-      const prize = this.prizeOptions.find((p) => p.id === row.prizeId);
-      if (prize) {
-        row.prizeName = prize.name;
-      } else {
-        row.prizeName = '';
-      }
+    getPrizeImage(prizeId) {
+      const prize = this.prizeOptions.find(p => p.id === prizeId);
+      return prize?.image || '';
     },
-
-    /**
-     * 计算礼品总数
-     * @param {Object} row 当前行
-     */
     calculateTotal(row) {
       row.total = row.quantity * row.multiple;
     },
-
-    /**
-     * 添加奖品项
-     */
+    calculatePointsTotal(row) {
+      row.total = row.quantity * row.multiple;
+    },
     handleAddPrize() {
-      const newItem = {
+      this.auditForm.prizeList.push({
         prizeId: '',
         prizeName: '',
         quantity: 1,
         multiple: this.coinMultiple,
         total: this.coinMultiple,
-      };
-      this.auditForm.prizeList.push(newItem);
+      });
     },
-
-    /**
-     * 删除奖品项
-     * @param {Number} index 索引
-     */
     handleDeletePrize(index) {
       this.auditForm.prizeList.splice(index, 1);
     },
-
-    /**
-     * 取消
-     */
     handleCancel() {
       this.visible = false;
     },
-
-    /**
-     * 弹窗关闭后清理
-     */
     handleClosed() {
-      // 停止视频播放
       if (this.$refs.reviewVideoPlayer) {
         this.$refs.reviewVideoPlayer.pause();
         this.$refs.reviewVideoPlayer.currentTime = 0;
       }
       this.currentRow = null;
     },
-
-    /**
-     * 确定提交 - 触发二次确认
-     */
     handleConfirm() {
-      // 通过时校验奖品信息完整性
       if (this.auditForm.auditResult === 'pass') {
-        const hasInvalidPrize = this.auditForm.prizeList.some((item) => !item.prizeId);
-        if (hasInvalidPrize) {
-          this.$message.warning('请选择完整的奖品信息');
-          return;
+        if (this.auditForm.prizeType === 'physical') {
+          const hasInvalidPrize = this.auditForm.prizeList.some(item => !item.prizeId);
+          if (hasInvalidPrize) {
+            this.$message.warning('请选择完整的奖品信息');
+            return;
+          }
         }
-        if (this.auditForm.prizeList.length === 0) {
-          this.$message.warning('请至少添加一项奖品');
-          return;
-        }
-      }
-
-      // 驳回时校验驳回原因
-      if (this.auditForm.auditResult === 'reject') {
+      } else {
         if (!this.auditForm.rejectReason || this.auditForm.rejectReason.trim() === '') {
           this.$message.warning('请填写驳回原因');
           return;
         }
       }
-
-      // ===== 二次确认防误触机制 =====
-      if (this.auditForm.auditResult === 'pass') {
-        // 通过的二次确认
-        const totalText = this.totalPrizeText;
-        this.$confirm(
-          `将通过审核，将发放 ${totalText}给该用户，是否确认？`,
-          '审核确认',
-          {
-            confirmButtonText: '确认通过',
-            cancelButtonText: '取消',
-            type: 'success',
-            distinguishCancelAndClose: true,
-          }
-        )
-          .then(() => {
-            this.submitAudit();
-          })
-          .catch((action) => {
-            if (action === 'cancel') {
-              // 用户取消，不做处理
-            }
-          });
-      } else {
-        // 驳回的二次确认
-        this.$confirm(
-          `驳回审核，用户权益将不发放，驳回原因：${this.auditForm.rejectReason}，是否确认？`,
-          '审核确认',
-          {
-            confirmButtonText: '确认驳回',
-            cancelButtonText: '取消',
-            type: 'warning',
-            distinguishCancelAndClose: true,
-          }
-        )
-          .then(() => {
-            this.submitAudit();
-          })
-          .catch((action) => {
-            if (action === 'cancel') {
-              // 用户取消，不做处理
-            }
-          });
-      }
+      this.submitAudit();
     },
-
-    /**
-     * 提交审核结果
-     */
     submitAudit() {
       const result = {
         id: this.currentRow.id,
@@ -450,10 +321,7 @@ export default {
         prizeList: this.auditForm.auditResult === 'pass' ? this.auditForm.prizeList : [],
         rejectReason: this.auditForm.auditResult === 'reject' ? this.auditForm.rejectReason : '',
       };
-
-      this.$message.success(
-        this.auditForm.auditResult === 'pass' ? '审核通过成功' : '已驳回审核'
-      );
+      this.$message.success(this.auditForm.auditResult === 'pass' ? '审核通过成功' : '已驳回审核');
       this.$emit('success', result);
       this.visible = false;
     },
@@ -464,147 +332,143 @@ export default {
 <style lang="scss" scoped>
 .review-audit-dialog {
   ::v-deep .el-dialog__body {
-    padding-top: 10px;
+    padding: 16px;
     max-height: 75vh;
     overflow-y: auto;
+    background: #f5f7fa;
+  }
+
+  ::v-deep .el-dialog__header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid #ebeef5;
+  }
+
+  ::v-deep .el-dialog__footer {
+    padding: 16px 20px;
+    border-top: 1px solid #ebeef5;
   }
 }
 
 .audit-content {
-  padding: 0 10px;
+  padding: 0;
 }
 
-.section-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: #303133;
-  margin-bottom: 16px;
-}
-
-/* ========== 多媒体对比区域 ========== */
-.media-compare-section {
-  margin-bottom: 10px;
-}
-
-.media-compare-wrapper {
-  display: flex;
-  align-items: stretch;
-  gap: 20px;
-}
-
-.media-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.media-col-header {
+.card-header {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.card-icon {
+  font-size: 16px;
+  color: #409eff;
+}
+
+.card-title {
+  font-size: 14px;
+  color: #303133;
+}
+
+.info-card,
+.status-card,
+.prize-card {
+  margin-bottom: 12px;
+  border-radius: 6px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.rule-label {
   font-size: 13px;
   color: #606266;
   margin-bottom: 8px;
-  font-weight: 500;
-
-  i {
-    color: #409eff;
-  }
 }
 
-.media-card {
-  flex: 1;
-  border-radius: 6px;
-  overflow: hidden;
-  border: 2px solid #ebeef5;
-  background: #f5f7fa;
-  min-height: 220px;
+.media-row {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  gap: 12px;
+}
 
-  .media-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+.media-item {
+  flex: 1;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f5f7fa;
 
-  &.rule-card {
-    border-color: #e1f3d8;
-  }
-
-  &.video-card {
-    border-color: #d9ecff;
+  &.video-item {
     background: #000;
   }
 }
 
+.media-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+
 .review-video {
   width: 100%;
-  max-height: 250px;
-  background: #000;
+  height: 220px;
 }
 
 .video-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  height: 220px;
   color: #909399;
   font-size: 14px;
+  gap: 8px;
 
   i {
-    font-size: 36px;
+    font-size: 24px;
   }
 }
 
-/* VS 分隔符 */
-.vs-divider {
+.audit-status-section {
+  padding: 8px 0;
+}
+
+.audit-radio-group {
+  display: flex;
+  gap: 24px;
+}
+
+.audit-radio {
   display: flex;
   align-items: center;
-  justify-content: center;
 
-  span {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: #409eff;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  &.pass {
+    ::v-deep .el-radio__input.is-checked .el-radio__inner {
+      border-color: #67c23a;
+      background: #67c23a;
+    }
   }
-}
 
-/* ========== 审核操作区 ========== */
-.audit-section {
-  margin-top: 10px;
-}
+  &.reject {
+    ::v-deep .el-radio__input.is-checked .el-radio__inner {
+      border-color: #f56c6c;
+      background: #f56c6c;
+    }
+  }
 
-.audit-form-item {
-  margin-bottom: 20px;
-}
-
-.audit-status-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-
-  .status-label {
+  .radio-text {
     font-size: 14px;
-    color: #606266;
-    font-weight: 500;
+    color: #303133;
+    margin-left: 6px;
   }
 }
 
-.reject-reason-section {
-  margin-bottom: 20px;
-  padding-left: 66px;
+.reject-section {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed #ebeef5;
 
-  .reason-label {
+  .reject-label {
     font-size: 14px;
     color: #606266;
     font-weight: 500;
@@ -612,72 +476,135 @@ export default {
     margin-bottom: 8px;
   }
 
-  .reject-reason-input {
+  .reject-textarea {
     width: 100%;
-    max-width: 400px;
+  }
+}
+
+.prize-type-section {
+  margin-bottom: 16px;
+}
+
+.prize-type-group {
+  display: flex;
+  gap: 24px;
+}
+
+.prize-radio {
+  display: flex;
+  align-items: center;
+
+  .radio-text {
+    font-size: 14px;
+    color: #303133;
+    margin-left: 6px;
   }
 }
 
 .multiple-tip {
-  background: #f5f7fa;
+  background: #ecf5ff;
   border-radius: 4px;
   padding: 10px 14px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
-  font-size: 13px;
-  color: #909399;
+  font-size: 12px;
+  color: #606266;
 
   i {
     color: #409eff;
-    margin-top: 2px;
+    font-size: 14px;
   }
 }
 
 .prize-table-wrapper {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
-.add-prize-row {
-  margin-top: 12px;
-  text-align: left;
+.prize-table {
+  ::v-deep .el-table__header-wrapper th {
+    background: #fafafa;
+    font-weight: 600;
+    color: #606266;
+    font-size: 12px;
+  }
+
+  ::v-deep .el-table__body-wrapper td {
+    font-size: 13px;
+    color: #303133;
+  }
+}
+
+.prize-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.prize-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 4px;
+  object-fit: cover;
+  border: 1px solid #ebeef5;
+}
+
+.prize-detail {
+  flex: 1;
+  min-width: 0;
+}
+
+.prize-name {
+  font-size: 13px;
+  color: #303133;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prize-id {
+  font-size: 12px;
+  color: #909399;
+}
+
+.text-gray {
+  color: #909399;
+  font-size: 13px;
+}
+
+.multiple-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: #f5f7fa;
+  border-radius: 4px;
+  font-size: 12px;
+  color: #409eff;
+  font-weight: 500;
+}
+
+.total-text {
+  font-weight: 600;
+  color: #409eff;
+  font-size: 14px;
+}
+
+.prize-actions {
+  margin-top: 14px;
 }
 
 .delete-icon {
   font-size: 18px;
   color: #f56c6c;
   cursor: pointer;
-  transition: color 0.2s;
 
   &:hover {
     color: #f78989;
   }
 }
 
-.total-num {
-  font-weight: 600;
-  color: #409eff;
-}
-
-.prize-summary {
-  background: #ecf5ff;
-  border-radius: 4px;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-
-  .summary-label {
-    font-size: 14px;
-    color: #606266;
-  }
-
-  .summary-value {
-    font-size: 16px;
-    font-weight: 600;
-    color: #409eff;
-  }
+.points-form {
+  margin-top: 14px;
 }
 </style>
