@@ -52,17 +52,12 @@
 
           <!-- 第二行筛选 -->
           <template v-if="!filterCollapsed">
-            <el-form-item label="支付状态：">
+            <el-form-item label="订单状态：">
               <el-select clearable v-model="filterForm.orderStatus" placeholder="全部" class="form-content-width">
                 <el-option v-for="(item, index) in orderStatusOptions" :key="index" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="退款状态：">
-              <el-select clearable v-model="filterForm.refundStatus" placeholder="全部" class="form-content-width">
-                <el-option v-for="(item, index) in refundStatusOptions" :key="index" :label="item.label" :value="item.value"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="支付类型：">
+            <el-form-item label="支付渠道：">
               <el-select clearable v-model="filterForm.payMethod" placeholder="全部" class="form-content-width">
                 <el-option v-for="(item, index) in payMethodOptions" :key="index" :label="item.label" :value="item.value"></el-option>
               </el-select>
@@ -200,14 +195,14 @@
             />
           </template>
           <template slot-scope="{ row }">
-            <span class="amount-value pay-amount">{{ row.orderStatus === 'paid' ? '¥' + row.payAmount.toFixed(2) : '-' }}</span>
+            <span class="amount-value pay-amount">{{ row.orderStatus === 'pending' || row.orderStatus === 'cancelled' ? '-' : '¥' + row.payAmount.toFixed(2) }}</span>
           </template>
         </el-table-column>
 
-        <!-- 支付类型 -->
-        <el-table-column label="支付类型" min-width="150" align="center">
+        <!-- 支付渠道 -->
+        <el-table-column label="支付渠道" min-width="120" align="center">
           <template slot-scope="{ row }">
-            <span>{{ row.orderStatus === 'unpaid' ? '-' : getPayMethodText(row.payMethod) }}</span>
+            <span>{{ row.orderStatus === 'pending' ? '-' : getPayMethodText(row.payMethod) }}</span>
           </template>
         </el-table-column>
 
@@ -225,18 +220,10 @@
           </template>
         </el-table-column>
 
-        <!-- 支付状态列 -->
-        <el-table-column label="支付状态" width="100" align="center">
+        <!-- 订单状态列 -->
+        <el-table-column label="订单状态" width="100" align="center">
           <template slot-scope="{ row }">
-            <span :class="['status-text', row.orderStatus === 'paid' ? 'status-paid' : 'status-unpaid']">{{ getOrderStatusText(row.orderStatus) }}</span>
-          </template>
-        </el-table-column>
-
-        <!-- 退款状态列 -->
-        <el-table-column label="退款状态" width="100" align="center">
-          <template slot-scope="{ row }">
-            <span v-if="row.refundStatus === 'none'" class="status-text status-none">-</span>
-            <span v-else :class="['status-text', row.refundStatus === 'pending' ? 'status-pending' : row.refundStatus === 'success' ? 'status-refunded' : '']">{{ getRefundStatusText(row.refundStatus) }}</span>
+            <span :class="['status-text', getOrderStatusClass(row.orderStatus)]">{{ getOrderStatusText(row.orderStatus) }}</span>
           </template>
         </el-table-column>
 
@@ -244,10 +231,6 @@
         <el-table-column label="操作" fixed="right" width="120" align="center">
           <template slot-scope="{ row }">
             <a class="action-link" v-db-click @click="handleDetail(row)">详情</a>
-            <template v-if="row.orderStatus === 'paid' && row.refundStatus === 'pending'">
-              <span class="action-divider">|</span>
-              <a class="action-link" v-db-click @click="handleRefund(row)">退款</a>
-            </template>
           </template>
         </el-table-column>
       </el-table>
@@ -284,9 +267,6 @@
             <el-descriptions-item label="外部订单号">{{ currentRow.externalOrderNo || '-' }}</el-descriptions-item>
             <el-descriptions-item label="订单状态">
               <el-tag size="small" :type="getOrderStatusTagType(currentRow.orderStatus)">{{ getOrderStatusText(currentRow.orderStatus) }}</el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="退款状态">
-              <el-tag size="small" :type="getRefundStatusTagType(currentRow.refundStatus)">{{ getRefundStatusText(currentRow.refundStatus) }}</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="创建时间">{{ currentRow.createTime }}</el-descriptions-item>
             <el-descriptions-item label="支付时间">{{ currentRow.payTime || '-' }}</el-descriptions-item>
@@ -330,60 +310,10 @@
         <div class="detail-section">
           <div class="section-title">支付信息</div>
           <el-descriptions :column="2" border size="small">
-            <el-descriptions-item label="支付类型">{{ currentRow.orderStatus === 'unpaid' ? '-' : getPayMethodText(currentRow.payMethod) }}</el-descriptions-item>
-            <el-descriptions-item label="汇付商户号">{{ currentRow.huifuMerchantNo || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="支付渠道">{{ currentRow.orderStatus === 'pending' ? '-' : getPayMethodText(currentRow.payMethod) }}</el-descriptions-item>
             <el-descriptions-item label="订单来源">{{ getOrderSourceText(currentRow.orderSource) }}</el-descriptions-item>
             <el-descriptions-item label="支付时间">{{ currentRow.payTime || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="外部订单号" :span="2">{{ currentRow.externalOrderNo || '-' }}</el-descriptions-item>
-          </el-descriptions>
-        </div>
-
-        <!-- 模块6：退款信息 -->
-        <div class="detail-section">
-          <div class="section-title">退款信息</div>
-          <el-descriptions v-if="currentRow.refundStatus === 'success'" :column="2" border size="small">
-            <el-descriptions-item label="退款状态">
-              <el-tag size="small" :type="getRefundStatusTagType(currentRow.refundStatus)">{{ getRefundStatusText(currentRow.refundStatus) }}</el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="退款类型">{{ currentRow.refundType || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="退款金额">¥{{ currentRow.refundAmount.toFixed(2) }}</el-descriptions-item>
-            <el-descriptions-item label="退款时间">{{ currentRow.refundTime || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="内部退款单号">{{ currentRow.internalRefundNo || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="外部退款单号">{{ currentRow.externalRefundNo || '-' }}</el-descriptions-item>
-          </el-descriptions>
-          <el-descriptions v-else-if="currentRow.refundStatus === 'pending'" :column="2" border size="small">
-            <el-descriptions-item label="退款状态">
-              <el-tag size="small" :type="getRefundStatusTagType(currentRow.refundStatus)">{{ getRefundStatusText(currentRow.refundStatus) }}</el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="申请退款金额">¥{{ currentRow.payAmount.toFixed(2) }}</el-descriptions-item>
-            <el-descriptions-item label="申请时间">{{ currentRow.refundApplyTime || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="申请原因" :span="2">{{ currentRow.refundReason || '-' }}</el-descriptions-item>
-          </el-descriptions>
-          <el-descriptions v-else-if="currentRow.refundStatus === 'processing'" :column="2" border size="small">
-            <el-descriptions-item label="退款状态">
-              <el-tag size="small" :type="getRefundStatusTagType(currentRow.refundStatus)">{{ getRefundStatusText(currentRow.refundStatus) }}</el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="退款金额">¥{{ currentRow.payAmount.toFixed(2) }}</el-descriptions-item>
-            <el-descriptions-item label="申请时间">{{ currentRow.refundApplyTime || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="申请原因" :span="2">{{ currentRow.refundReason || '-' }}</el-descriptions-item>
-          </el-descriptions>
-          <el-descriptions v-else-if="currentRow.refundStatus === 'failed'" :column="2" border size="small">
-            <el-descriptions-item label="退款状态">
-              <el-tag size="small" :type="getRefundStatusTagType(currentRow.refundStatus)">{{ getRefundStatusText(currentRow.refundStatus) }}</el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="退款金额">¥{{ currentRow.payAmount.toFixed(2) }}</el-descriptions-item>
-            <el-descriptions-item label="申请时间">{{ currentRow.refundApplyTime || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="失败时间">{{ currentRow.refundTime || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="失败原因" :span="2">{{ currentRow.refundReason || '-' }}</el-descriptions-item>
-          </el-descriptions>
-          <el-descriptions v-else-if="currentRow.refundStatus === 'cancelled'" :column="2" border size="small">
-            <el-descriptions-item label="退款状态">
-              <el-tag size="small" :type="getRefundStatusTagType(currentRow.refundStatus)">{{ getRefundStatusText(currentRow.refundStatus) }}</el-tag>
-            </el-descriptions-item>
-            <el-descriptions-item label="申请退款金额">¥{{ currentRow.payAmount.toFixed(2) }}</el-descriptions-item>
-            <el-descriptions-item label="申请时间">{{ currentRow.refundApplyTime || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="取消时间">{{ currentRow.refundTime || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="取消原因" :span="2">{{ currentRow.refundReason || '-' }}</el-descriptions-item>
+            <el-descriptions-item label="外部订单号">{{ currentRow.externalOrderNo || '-' }}</el-descriptions-item>
           </el-descriptions>
         </div>
       </div>
@@ -400,7 +330,7 @@
         <p>确认导出当前查询结果的全部数据？</p>
         <div class="export-fields">
           <p class="export-fields-title">导出字段包含：</p>
-          <p>内部订单号、外部订单号、用户信息、充值金额、随机立减、实付金额、支付类型、汇付商户号、支付时间、创建时间、支付状态、退款状态。</p>
+          <p>内部订单号、外部订单号、用户信息、充值金额、随机立减、实付金额、支付渠道、订单来源、支付时间、创建时间、订单状态。</p>
         </div>
         <p class="export-count">当前查询结果共 {{ filteredData.length }} 条。</p>
       </div>
@@ -410,29 +340,6 @@
       </span>
     </el-dialog>
 
-    <!-- 退款确认弹窗 -->
-    <el-dialog
-      title="提示"
-      :visible.sync="refundDialogVisible"
-      width="420px"
-      :close-on-click-modal="false"
-      :show-close="true"
-      custom-class="refund-confirm-dialog"
-      @close="handleRefundDialogClose"
-    >
-      <div class="refund-confirm-content">
-        <div class="refund-confirm-icon">
-          <i class="el-icon-warning-outline"></i>
-        </div>
-        <div class="refund-confirm-text">
-          <div class="refund-confirm-desc">确定要对该订单进行退款吗？</div>
-        </div>
-      </div>
-      <span slot="footer" class="dialog-footer refund-confirm-footer">
-        <el-button @click="handleRefundOnly">仅退款</el-button>
-        <el-button type="primary" @click="handleRefundAndReturn">退款退币</el-button>
-      </span>
-    </el-dialog>
   </div>
 </template>
 
@@ -498,46 +405,26 @@ export default {
       // 导出弹窗
       exportDialogVisible: false,
 
-      // 退款确认弹窗
-      refundDialogVisible: false,
-      refundTarget: null,
-
       // 筛选收起状态
       filterCollapsed: false,
 
       // 选项数据
-      timeTypeOptions: [
-        { label: '创建时间', value: 'createTime' },
-        { label: '支付时间', value: 'payTime' },
-        { label: '退款时间', value: 'refundTime' },
-      ],
       orderStatusOptions: [
         { label: '全部', value: '' },
-        { label: '未支付', value: 'unpaid' },
+        { label: '待支付', value: 'pending' },
         { label: '已支付', value: 'paid' },
-      ],
-      refundStatusOptions: [
-        { label: '全部', value: '' },
-        { label: '待退款', value: 'pending' },
-        { label: '退款中', value: 'processing' },
-        { label: '退款成功', value: 'success' },
-        { label: '退款失败', value: 'failed' },
         { label: '已取消', value: 'cancelled' },
+        { label: '已退款', value: 'refunded' },
       ],
       payMethodOptions: [
         { label: '全部', value: '' },
-        { label: '宝付支付宝支付', value: 'baofu_alipay' },
-        { label: '宝付微信支付', value: 'baofu_weixin' },
-        { label: '汇付支付宝支付', value: 'huifu_alipay' },
-        { label: '汇付微信支付', value: 'huifu_weixin' },
+        { label: '汇付支付', value: 'huifu' },
+        { label: '宝付支付', value: 'baofu' },
       ],
       orderSourceOptions: [
         { label: '全部', value: '' },
-        { label: 'H5', value: 'h5' },
-        { label: '小程序', value: 'miniapp' },
-        { label: 'App', value: 'app' },
-        { label: '公众号', value: 'wechat_public' },
-        { label: '后台', value: 'admin' },
+        { label: '微信', value: 'wechat' },
+        { label: '支付宝', value: 'alipay' },
       ],
     };
   },
@@ -592,10 +479,8 @@ export default {
           internalOrderNo: 'CZ202...35584',
           externalOrderNo: 'HF202...35584',
           orderStatus: 'paid',
-          refundStatus: 'pending',
           createTime: '2026-06-26 10:20:30',
           payTime: '2026-06-26 10:24:30',
-          refundTime: '',
           avatar: '',
           nickname: 'Beedo',
           uid: 100,
@@ -603,24 +488,16 @@ export default {
           orderAmount: 100.00,
           randomDiscount: 5.00,
           payAmount: 95.00,
-          refundAmount: 0,
-          payMethod: 'huifu_weixin',
-          orderSource: 'h5',
-          huifuMerchantNo: '',
-          internalRefundNo: '',
-          externalRefundNo: '',
-          refundApplyTime: '',
-          refundReason: '',
+          payMethod: 'huifu',
+          orderSource: 'wechat',
         },
         {
           id: 2,
           internalOrderNo: 'CZ202...35585',
           externalOrderNo: 'BF203...35585',
-          orderStatus: 'paid',
-          refundStatus: 'success',
+          orderStatus: 'refunded',
           createTime: '2026-06-26 09:15:00',
           payTime: '2026-06-26 10:24:30',
-          refundTime: '2026-06-26 11:30:20',
           avatar: '',
           nickname: '熊猫咪',
           uid: 101,
@@ -628,24 +505,16 @@ export default {
           orderAmount: 50.00,
           randomDiscount: 0.00,
           payAmount: 50.00,
-          refundAmount: 50.00,
-          payMethod: 'baofu_alipay',
-          orderSource: 'miniapp',
-          huifuMerchantNo: '',
-          internalRefundNo: 'TK202606260001',
-          externalRefundNo: 'WXR202606260001',
-          refundApplyTime: '2026-06-26 10:00:00',
-          refundReason: '重复充值，申请退款',
+          payMethod: 'baofu',
+          orderSource: 'alipay',
         },
         {
           id: 3,
           internalOrderNo: 'CZ202...35586',
           externalOrderNo: 'CZ204...35586',
-          orderStatus: 'unpaid',
-          refundStatus: 'none',
+          orderStatus: 'pending',
           createTime: '2026-06-26 11:30:00',
           payTime: '',
-          refundTime: '',
           avatar: '',
           nickname: '小虎仔',
           uid: 102,
@@ -653,24 +522,16 @@ export default {
           orderAmount: 75.00,
           randomDiscount: 1.00,
           payAmount: 0,
-          refundAmount: 0,
           payMethod: '',
-          orderSource: 'app',
-          huifuMerchantNo: '',
-          internalRefundNo: '',
-          externalRefundNo: '',
-          refundApplyTime: '',
-          refundReason: '',
+          orderSource: 'wechat',
         },
         {
           id: 4,
           internalOrderNo: 'CZ202...35587',
           externalOrderNo: 'CZ205...35587',
-          orderStatus: 'unpaid',
-          refundStatus: 'none',
+          orderStatus: 'cancelled',
           createTime: '2026-06-26 13:02:47',
           payTime: '',
-          refundTime: '',
           avatar: '',
           nickname: '蓝天',
           uid: 103,
@@ -678,24 +539,16 @@ export default {
           orderAmount: 100.00,
           randomDiscount: 2.00,
           payAmount: 0,
-          refundAmount: 0,
-          payMethod: 'huifu_alipay',
-          orderSource: 'wechat_public',
-          huifuMerchantNo: '',
-          internalRefundNo: '',
-          externalRefundNo: '',
-          refundApplyTime: '',
-          refundReason: '',
+          payMethod: 'huifu',
+          orderSource: 'alipay',
         },
         {
           id: 5,
           internalOrderNo: 'CZ202...35588',
           externalOrderNo: 'CZ206...35588',
           orderStatus: 'paid',
-          refundStatus: 'pending',
           createTime: '2026-06-26 14:00:00',
           payTime: '2026-06-26 14:18:03',
-          refundTime: '',
           avatar: '',
           nickname: '花栗鼠',
           uid: 104,
@@ -703,24 +556,16 @@ export default {
           orderAmount: 125.00,
           randomDiscount: 3.00,
           payAmount: 122.00,
-          refundAmount: 0,
-          payMethod: 'baofu_weixin',
-          orderSource: 'miniapp',
-          huifuMerchantNo: '',
-          internalRefundNo: '',
-          externalRefundNo: '',
-          refundApplyTime: '',
-          refundReason: '',
+          payMethod: 'baofu',
+          orderSource: 'wechat',
         },
         {
           id: 6,
           internalOrderNo: 'CZ202...77344',
           externalOrderNo: 'CZ207...35589',
           orderStatus: 'paid',
-          refundStatus: 'pending',
           createTime: '2026-06-26 15:00:00',
           payTime: '2026-06-26 15:37:59',
-          refundTime: '',
           avatar: '',
           nickname: '月光',
           uid: 105,
@@ -728,24 +573,16 @@ export default {
           orderAmount: 150.00,
           randomDiscount: 4.00,
           payAmount: 146.00,
-          refundAmount: 0,
-          payMethod: 'baofu_weixin',
-          orderSource: 'miniapp',
-          huifuMerchantNo: '',
-          internalRefundNo: '',
-          externalRefundNo: '',
-          refundApplyTime: '',
-          refundReason: '',
+          payMethod: 'baofu',
+          orderSource: 'wechat',
         },
         {
           id: 7,
           internalOrderNo: 'CZ202...60927',
           externalOrderNo: 'CZ208...35590',
-          orderStatus: 'paid',
-          refundStatus: 'pending',
+          orderStatus: 'refunded',
           createTime: '2026-06-26 16:00:00',
           payTime: '2026-06-26 16:50:44',
-          refundTime: '',
           avatar: '',
           nickname: '雪狐',
           uid: 106,
@@ -753,14 +590,8 @@ export default {
           orderAmount: 175.00,
           randomDiscount: 5.00,
           payAmount: 170.00,
-          refundAmount: 0,
-          payMethod: 'baofu_weixin',
-          orderSource: 'miniapp',
-          huifuMerchantNo: '',
-          internalRefundNo: '',
-          externalRefundNo: '',
-          refundApplyTime: '',
-          refundReason: '',
+          payMethod: 'huifu',
+          orderSource: 'alipay',
         },
       ];
     },
@@ -795,12 +626,7 @@ export default {
         data = data.filter(item => item.orderStatus === this.filterForm.orderStatus);
       }
 
-      // 退款状态筛选
-      if (this.filterForm.refundStatus) {
-        data = data.filter(item => item.refundStatus === this.filterForm.refundStatus);
-      }
-
-      // 支付方式筛选
+      // 支付渠道筛选
       if (this.filterForm.payMethod) {
         data = data.filter(item => item.payMethod === this.filterForm.payMethod);
       }
@@ -808,11 +634,6 @@ export default {
       // 订单来源筛选
       if (this.filterForm.orderSource) {
         data = data.filter(item => item.orderSource === this.filterForm.orderSource);
-      }
-
-      // 汇付商户号筛选
-      if (this.filterForm.huifuMerchantNo) {
-        data = data.filter(item => item.huifuMerchantNo && item.huifuMerchantNo.includes(this.filterForm.huifuMerchantNo));
       }
 
       // 时间范围筛选
@@ -847,10 +668,8 @@ export default {
         internalOrderNo: '',
         externalOrderNo: '',
         orderStatus: '',
-        refundStatus: '',
         payMethod: '',
         orderSource: '',
-        huifuMerchantNo: '',
       };
       this.handleSearch();
     },
@@ -866,17 +685,17 @@ export default {
       const actualPay = data
         .filter(item => item.orderStatus === 'paid')
         .reduce((sum, item) => sum + item.payAmount, 0);
-      // 充值退款金额：已退款成功订单的退款金额合计
+      // 充值退款金额：已退款订单的实付金额合计
       const refundAmount = data
-        .filter(item => item.refundStatus === 'success')
-        .reduce((sum, item) => sum + (item.refundAmount || item.payAmount), 0);
-      // 支付宝充值金额：支付方式为支付宝的实付金额合计
-      const alipayAmount = data
-        .filter(item => item.orderStatus === 'paid' && item.payMethod.includes('alipay'))
+        .filter(item => item.orderStatus === 'refunded')
         .reduce((sum, item) => sum + item.payAmount, 0);
-      // 微信充值金额：支付方式为微信的实付金额合计
+      // 支付宝充值金额：订单来源为支付宝的实付金额合计
+      const alipayAmount = data
+        .filter(item => item.orderStatus === 'paid' && item.orderSource === 'alipay')
+        .reduce((sum, item) => sum + item.payAmount, 0);
+      // 微信充值金额：订单来源为微信的实付金额合计
       const wechatAmount = data
-        .filter(item => item.orderStatus === 'paid' && item.payMethod.includes('weixin'))
+        .filter(item => item.orderStatus === 'paid' && item.orderSource === 'wechat')
         .reduce((sum, item) => sum + item.payAmount, 0);
 
       this.statCards[0].value = totalRecharge.toFixed(2);
@@ -890,70 +709,6 @@ export default {
     handleDetail(row) {
       this.currentRow = { ...row };
       this.detailDrawerVisible = true;
-    },
-
-    handleRefund(row) {
-      if (row.orderStatus !== 'paid') {
-        this.$message.warning('仅已支付订单支持退款操作');
-        return;
-      }
-      this.refundTarget = { ...row };
-      this.refundDialogVisible = true;
-    },
-
-    handleRefundDialogClose() {
-      this.refundDialogVisible = false;
-      this.refundTarget = null;
-    },
-
-    handleRefundOnly() {
-      if (!this.refundTarget) return;
-      const now = this.formatDateTime(new Date());
-      const refundNo = `TK${Date.now()}`;
-      const updateData = (item) => {
-        if (item.id !== this.refundTarget.id) return item;
-        return {
-          ...item,
-          refundStatus: 'success',
-          refundAmount: item.payAmount,
-          refundTime: now,
-          internalRefundNo: refundNo,
-          externalRefundNo: `EXT${refundNo}`,
-          refundType: '仅退款',
-        };
-      };
-
-      this.allTableData = this.allTableData.map(updateData);
-      this.filteredData = this.filteredData.map(updateData);
-      this.refundDialogVisible = false;
-      this.refundTarget = null;
-      this.updateStatCards();
-      this.$message.success('仅退款操作已提交');
-    },
-
-    handleRefundAndReturn() {
-      if (!this.refundTarget) return;
-      const now = this.formatDateTime(new Date());
-      const refundNo = `TK${Date.now()}`;
-      const updateData = (item) => {
-        if (item.id !== this.refundTarget.id) return item;
-        return {
-          ...item,
-          refundStatus: 'success',
-          refundAmount: item.payAmount,
-          refundTime: now,
-          internalRefundNo: refundNo,
-          externalRefundNo: `EXT${refundNo}`,
-          refundType: '退款退币',
-        };
-      };
-
-      this.allTableData = this.allTableData.map(updateData);
-      this.filteredData = this.filteredData.map(updateData);
-      this.refundDialogVisible = false;
-      this.refundTarget = null;
-      this.updateStatCards();
-      this.$message.success('退款退市操作已提交');
     },
 
     copyText(text) {
@@ -999,37 +754,27 @@ export default {
 
     // ==================== 状态文本与标签 ====================
     getOrderStatusText(status) {
-      const map = { unpaid: '未支付', paid: '已支付' };
+      const map = { pending: '待支付', paid: '已支付', cancelled: '已取消', refunded: '已退款' };
       return map[status] || status;
     },
     getOrderStatusTagType(status) {
-      const map = { unpaid: 'info', paid: 'success' };
+      const map = { pending: 'info', paid: 'success', cancelled: 'warning', refunded: 'danger' };
       return map[status] || '';
     },
-    getRefundStatusText(status) {
-      const map = { none: '-', pending: '待退款', processing: '退款中', success: '已退款', failed: '退款失败', cancelled: '已取消' };
-      return map[status] || status;
-    },
-    getRefundStatusTagType(status) {
-      const map = { none: 'info', pending: 'primary', processing: 'primary', success: 'info', failed: 'danger', cancelled: 'info' };
-      return map[status] || 'info';
+    getOrderStatusClass(status) {
+      const map = { pending: 'status-pending', paid: 'status-paid', cancelled: 'status-cancelled', refunded: 'status-refunded' };
+      return map[status] || '';
     },
     getPayMethodText(method) {
       const map = {
-        baofu_alipay: '宝付支付宝支付',
-        baofu_weixin: '宝付微信支付',
-        huifu_alipay: '汇付支付宝支付',
-        huifu_weixin: '汇付微信支付',
+        huifu: '汇付支付',
+        baofu: '宝付支付',
       };
       return map[method] || method;
     },
     getOrderSourceText(source) {
-      const map = { h5: 'H5', miniapp: '小程序', app: 'App', wechat_public: '公众号', admin: '后台' };
+      const map = { wechat: '微信', alipay: '支付宝' };
       return map[source] || source;
-    },
-    getRechargeChannelText(channel) {
-      const map = { huifu: '汇付', baofu: '宝付', yizhifu: '逸支付' };
-      return map[channel] || channel;
     },
     formatDateTime(date) {
       const pad = (num) => String(num).padStart(2, '0');
@@ -1201,23 +946,19 @@ export default {
     background: #f0f9eb;
   }
 
-  &.status-unpaid {
+  &.status-pending {
     color: #909399;
     background: #f4f4f5;
   }
 
-  &.status-pending {
-    color: #409eff;
-    background: #ecf5ff;
+  &.status-cancelled {
+    color: #e6a23c;
+    background: #fdf6ec;
   }
 
   &.status-refunded {
-    color: #909399;
-    background: #f4f4f5;
-  }
-
-  &.status-none {
-    color: #c0c4cc;
+    color: #f56c6c;
+    background: #fef0f0;
   }
 }
 
