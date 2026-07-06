@@ -352,6 +352,30 @@
       </span>
     </el-dialog>
 
+    <!-- 退款确认弹窗 -->
+    <el-dialog
+      title="提示"
+      :visible.sync="refundDialogVisible"
+      width="420px"
+      :close-on-click-modal="false"
+      :show-close="true"
+      custom-class="refund-confirm-dialog"
+      @close="refundTarget = null"
+    >
+      <div class="refund-confirm-content">
+        <div class="refund-confirm-icon">
+          <i class="el-icon-warning-outline"></i>
+        </div>
+        <div class="refund-confirm-text">
+          <div class="refund-confirm-desc">确定要对该订单进行退款吗？</div>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer refund-confirm-footer">
+        <el-button @click="handleRefundOnly">仅退款</el-button>
+        <el-button type="primary" @click="handleRefundAndReturn">退款退币</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -416,6 +440,10 @@ export default {
 
       // 导出弹窗
       exportDialogVisible: false,
+
+      // 退款确认弹窗
+      refundDialogVisible: false,
+      refundTarget: null,
 
       // 筛选收起状态
       filterCollapsed: false,
@@ -807,7 +835,56 @@ export default {
       return map[status] || '';
     },
     handleRefund(row) {
-      this.$message.info('退款功能开发中');
+      this.refundTarget = { ...row };
+      this.refundDialogVisible = true;
+    },
+
+    handleRefundOnly() {
+      if (!this.refundTarget) return;
+      const now = this.formatDateTime(new Date());
+      const refundNo = 'TK' + Date.now();
+      const updateData = (item) => {
+        if (item.id !== this.refundTarget.id) return item;
+        return {
+          ...item,
+          orderStatus: 'refunded',
+          refundStatus: 'success',
+          refundAmount: item.payAmount,
+          refundTime: now,
+          internalRefundNo: refundNo,
+          externalRefundNo: 'EXT' + refundNo,
+        };
+      };
+      this.allTableData = this.allTableData.map(updateData);
+      this.filteredData = this.filteredData.map(updateData);
+      this.refundDialogVisible = false;
+      this.refundTarget = null;
+      this.updateStatCards();
+      this.$message.success('仅退款操作成功');
+    },
+
+    handleRefundAndReturn() {
+      if (!this.refundTarget) return;
+      const now = this.formatDateTime(new Date());
+      const refundNo = 'TK' + Date.now();
+      const updateData = (item) => {
+        if (item.id !== this.refundTarget.id) return item;
+        return {
+          ...item,
+          orderStatus: 'refunded',
+          refundStatus: 'success',
+          refundAmount: item.payAmount,
+          refundTime: now,
+          internalRefundNo: refundNo,
+          externalRefundNo: 'EXT' + refundNo,
+        };
+      };
+      this.allTableData = this.allTableData.map(updateData);
+      this.filteredData = this.filteredData.map(updateData);
+      this.refundDialogVisible = false;
+      this.refundTarget = null;
+      this.updateStatCards();
+      this.$message.success('退款退币操作成功');
     },
     getPayMethodText(method) {
       const map = {
@@ -1396,13 +1473,13 @@ export default {
 }
 
 ::v-deep .refund-confirm-dialog .el-dialog__body {
-  padding: 12px 20px 10px;
+  padding: 20px 24px 16px;
 }
 
 .refund-confirm-content {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
+  align-items: center;
+  gap: 14px;
 }
 
 .refund-confirm-icon {
@@ -1416,20 +1493,13 @@ export default {
   justify-content: center;
 
   i {
-    font-size: 24px;
+    font-size: 22px;
     color: #e6a23c;
   }
 }
 
 .refund-confirm-text {
   flex: 1;
-}
-
-.refund-confirm-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #303133;
-  margin-bottom: 6px;
 }
 
 .refund-confirm-desc {
