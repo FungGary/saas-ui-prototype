@@ -52,12 +52,17 @@
 
           <!-- 第二行筛选 -->
           <template v-if="!filterCollapsed">
-            <el-form-item label="订单状态：">
+            <el-form-item label="支付状态：">
               <el-select clearable v-model="filterForm.orderStatus" placeholder="全部" class="form-content-width">
                 <el-option v-for="(item, index) in orderStatusOptions" :key="index" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="支付渠道：">
+            <el-form-item label="退款状态：">
+              <el-select clearable v-model="filterForm.refundStatus" placeholder="全部" class="form-content-width">
+                <el-option v-for="(item, index) in refundStatusOptions" :key="index" :label="item.label" :value="item.value"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="支付类型：">
               <el-select clearable v-model="filterForm.payMethod" placeholder="全部" class="form-content-width">
                 <el-option v-for="(item, index) in payMethodOptions" :key="index" :label="item.label" :value="item.value"></el-option>
               </el-select>
@@ -220,8 +225,8 @@
           </template>
         </el-table-column>
 
-        <!-- 订单状态列 -->
-        <el-table-column label="订单状态" width="100" align="center">
+        <!-- 支付状态列 -->
+        <el-table-column label="支付状态" width="100" align="center">
           <template slot-scope="{ row }">
             <span :class="['status-text', getOrderStatusClass(row.orderStatus)]">{{ getOrderStatusText(row.orderStatus) }}</span>
           </template>
@@ -231,6 +236,10 @@
         <el-table-column label="操作" fixed="right" width="120" align="center">
           <template slot-scope="{ row }">
             <a class="action-link" v-db-click @click="handleDetail(row)">详情</a>
+            <template v-if="row.orderStatus === 'paid'">
+              <span class="action-divider">|</span>
+              <a class="action-link" v-db-click @click="handleRefund(row)">退款</a>
+            </template>
           </template>
         </el-table-column>
       </el-table>
@@ -265,8 +274,11 @@
               <i class="el-icon-document-copy copy-icon" @click="copyText(currentRow.internalOrderNo)"></i>
             </el-descriptions-item>
             <el-descriptions-item label="外部订单号">{{ currentRow.externalOrderNo || '-' }}</el-descriptions-item>
-            <el-descriptions-item label="订单状态">
+            <el-descriptions-item label="支付状态">
               <el-tag size="small" :type="getOrderStatusTagType(currentRow.orderStatus)">{{ getOrderStatusText(currentRow.orderStatus) }}</el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="退款状态">
+              <el-tag size="small" :type="getRefundStatusTagType(currentRow.refundStatus)">{{ getRefundStatusText(currentRow.refundStatus) }}</el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="创建时间">{{ currentRow.createTime }}</el-descriptions-item>
             <el-descriptions-item label="支付时间">{{ currentRow.payTime || '-' }}</el-descriptions-item>
@@ -330,7 +342,7 @@
         <p>确认导出当前查询结果的全部数据？</p>
         <div class="export-fields">
           <p class="export-fields-title">导出字段包含：</p>
-          <p>内部订单号、外部订单号、用户信息、充值金额、随机立减、实付金额、支付渠道、订单来源、支付时间、创建时间、订单状态。</p>
+          <p>内部订单号、外部订单号、用户信息、充值金额、随机立减、实付金额、支付渠道、订单来源、支付时间、创建时间、支付状态、退款状态。</p>
         </div>
         <p class="export-count">当前查询结果共 {{ filteredData.length }} 条。</p>
       </div>
@@ -416,6 +428,14 @@ export default {
         { label: '已取消', value: 'cancelled' },
         { label: '已退款', value: 'refunded' },
       ],
+      refundStatusOptions: [
+        { label: '全部', value: '' },
+        { label: '待退款', value: 'pending' },
+        { label: '退款中', value: 'processing' },
+        { label: '已退款', value: 'success' },
+        { label: '退款失败', value: 'failed' },
+        { label: '已取消', value: 'cancelled' },
+      ],
       payMethodOptions: [
         { label: '全部', value: '' },
         { label: '汇付支付', value: 'huifu' },
@@ -479,6 +499,7 @@ export default {
           internalOrderNo: 'CZ202...35584',
           externalOrderNo: 'HF202...35584',
           orderStatus: 'paid',
+          refundStatus: 'none',
           createTime: '2026-06-26 10:20:30',
           payTime: '2026-06-26 10:24:30',
           avatar: '',
@@ -496,6 +517,7 @@ export default {
           internalOrderNo: 'CZ202...35585',
           externalOrderNo: 'BF203...35585',
           orderStatus: 'refunded',
+          refundStatus: 'success',
           createTime: '2026-06-26 09:15:00',
           payTime: '2026-06-26 10:24:30',
           avatar: '',
@@ -513,6 +535,7 @@ export default {
           internalOrderNo: 'CZ202...35586',
           externalOrderNo: 'CZ204...35586',
           orderStatus: 'pending',
+          refundStatus: 'none',
           createTime: '2026-06-26 11:30:00',
           payTime: '',
           avatar: '',
@@ -529,7 +552,8 @@ export default {
           id: 4,
           internalOrderNo: 'CZ202...35587',
           externalOrderNo: 'CZ205...35587',
-          orderStatus: 'cancelled',
+          orderStatus: 'paid',
+          refundStatus: 'none',
           createTime: '2026-06-26 13:02:47',
           payTime: '',
           avatar: '',
@@ -547,6 +571,7 @@ export default {
           internalOrderNo: 'CZ202...35588',
           externalOrderNo: 'CZ206...35588',
           orderStatus: 'paid',
+          refundStatus: 'none',
           createTime: '2026-06-26 14:00:00',
           payTime: '2026-06-26 14:18:03',
           avatar: '',
@@ -557,13 +582,14 @@ export default {
           randomDiscount: 3.00,
           payAmount: 122.00,
           payMethod: 'baofu',
-          orderSource: 'wechat',
+          orderSource: 'alipay',
         },
         {
           id: 6,
           internalOrderNo: 'CZ202...77344',
           externalOrderNo: 'CZ207...35589',
-          orderStatus: 'paid',
+          orderStatus: 'refunded',
+          refundStatus: 'success',
           createTime: '2026-06-26 15:00:00',
           payTime: '2026-06-26 15:37:59',
           avatar: '',
@@ -580,16 +606,17 @@ export default {
           id: 7,
           internalOrderNo: 'CZ202...60927',
           externalOrderNo: 'CZ208...35590',
-          orderStatus: 'refunded',
+          orderStatus: 'cancelled',
+          refundStatus: 'none',
           createTime: '2026-06-26 16:00:00',
-          payTime: '2026-06-26 16:50:44',
+          payTime: '',
           avatar: '',
           nickname: '雪狐',
           uid: 106,
           userNo: '5916955602',
           orderAmount: 175.00,
           randomDiscount: 5.00,
-          payAmount: 170.00,
+          payAmount: 0,
           payMethod: 'huifu',
           orderSource: 'alipay',
         },
@@ -624,6 +651,11 @@ export default {
       // 订单状态筛选
       if (this.filterForm.orderStatus) {
         data = data.filter(item => item.orderStatus === this.filterForm.orderStatus);
+      }
+
+      // 退款状态筛选
+      if (this.filterForm.refundStatus) {
+        data = data.filter(item => item.refundStatus === this.filterForm.refundStatus);
       }
 
       // 支付渠道筛选
@@ -668,6 +700,7 @@ export default {
         internalOrderNo: '',
         externalOrderNo: '',
         orderStatus: '',
+        refundStatus: '',
         payMethod: '',
         orderSource: '',
       };
@@ -764,6 +797,17 @@ export default {
     getOrderStatusClass(status) {
       const map = { pending: 'status-pending', paid: 'status-paid', cancelled: 'status-cancelled', refunded: 'status-refunded' };
       return map[status] || '';
+    },
+    getRefundStatusText(status) {
+      const map = { none: '无退款', pending: '待退款', processing: '退款中', success: '已退款', failed: '退款失败', cancelled: '已取消' };
+      return map[status] || status;
+    },
+    getRefundStatusTagType(status) {
+      const map = { none: 'info', pending: 'warning', processing: '', success: 'success', failed: 'danger', cancelled: 'info' };
+      return map[status] || '';
+    },
+    handleRefund(row) {
+      this.$message.info('退款功能开发中');
     },
     getPayMethodText(method) {
       const map = {
@@ -952,13 +996,13 @@ export default {
   }
 
   &.status-cancelled {
-    color: #e6a23c;
-    background: #fdf6ec;
+    color: #909399;
+    background: #f4f4f5;
   }
 
   &.status-refunded {
-    color: #f56c6c;
-    background: #fef0f0;
+    color: #909399;
+    background: #f4f4f5;
   }
 }
 

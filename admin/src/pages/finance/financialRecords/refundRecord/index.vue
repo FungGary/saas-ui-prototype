@@ -60,7 +60,7 @@
                 <el-option v-for="(item, index) in businessTypeOptions" :key="index" :label="item.label" :value="item.value"></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="支付类型：">
+            <el-form-item label="支付渠道：">
               <el-select clearable v-model="filterForm.payMethod" placeholder="全部" class="form-content-width">
                 <el-option v-for="(item, index) in payMethodOptions" :key="index" :label="item.label" :value="item.value"></el-option>
               </el-select>
@@ -91,7 +91,7 @@
     <el-card :bordered="false" shadow="never" class="mt16" :body-style="{ padding: '0 20px 20px' }">
       <div class="table-toolbar">
         <div class="toolbar-left">
-          <span class="table-title">充值记录</span>
+          <span class="table-title">退款记录</span>
         </div>
         <div class="toolbar-right">
           <el-button size="small" v-db-click @click="handleExport">导出</el-button>
@@ -167,8 +167,8 @@
           </template>
         </el-table-column>
 
-        <!-- 支付类型 -->
-        <el-table-column label="支付类型" min-width="130" align="center">
+        <!-- 支付渠道 -->
+        <el-table-column label="支付渠道" min-width="130" align="center">
           <template slot-scope="{ row }">
             <span>{{ getPayMethodText(row.payMethod) }}</span>
           </template>
@@ -288,7 +288,7 @@
         <div class="detail-section">
           <div class="section-title">支付信息</div>
           <el-descriptions :column="2" border size="small">
-            <el-descriptions-item label="支付类型">{{ getPayMethodText(currentRow.payMethod) }}</el-descriptions-item>
+            <el-descriptions-item label="支付渠道">{{ getPayMethodText(currentRow.payMethod) }}</el-descriptions-item>
             <el-descriptions-item label="支付时间">{{ currentRow.payTime || '-' }}</el-descriptions-item>
           </el-descriptions>
         </div>
@@ -301,7 +301,7 @@
         <p>确认导出当前查询结果的全部数据？</p>
         <div class="export-fields">
           <p class="export-fields-title">导出字段包含：</p>
-          <p>退款订单号、内部订单号、外部订单号、用户信息、业务类型、退款金额、支付类型、订单来源、退款状态、退款原因、申请时间、退款时间。</p>
+          <p>退款订单号、内部订单号、外部订单号、用户信息、业务类型、退款金额、支付渠道、订单来源、退款状态、退款原因、申请时间、退款时间。</p>
         </div>
         <p class="export-count">当前查询结果共 {{ filteredData.length }} 条。</p>
       </div>
@@ -378,17 +378,13 @@ export default {
       ],
       payMethodOptions: [
         { label: '全部', value: '' },
-        { label: '汇付微信支付', value: 'huifu_weixin' },
-        { label: '宝付支付宝支付', value: 'baofu_alipay' },
-        { label: '汇付支付宝支付', value: 'huifu_alipay' },
-        { label: '宝付微信支付', value: 'baofu_weixin' },
+        { label: '汇付支付', value: 'huifu' },
+        { label: '宝付支付', value: 'baofu' },
       ],
       orderSourceOptions: [
         { label: '全部', value: '' },
-        { label: 'H5', value: 'h5' },
-        { label: '小程序', value: 'miniapp' },
-        { label: 'APP', value: 'app' },
-        { label: '公众号', value: 'wechat_public' },
+        { label: '微信', value: 'wechat' },
+        { label: '支付宝', value: 'alipay' },
       ],
     };
   },
@@ -454,8 +450,8 @@ export default {
           orderAmount: 100.00,
           payAmount: 95.00,
           refundAmount: 100.00,
-          payMethod: 'huifu_weixin',
-          orderSource: 'h5',
+          payMethod: 'huifu',
+          orderSource: 'alipay',
           createTime: '2026-06-26 10:20:30',
           payTime: '2026-06-26 10:24:30',
           refundReason: '重复充值，申请退款',
@@ -477,8 +473,8 @@ export default {
           orderAmount: 50.00,
           payAmount: 50.00,
           refundAmount: 50.00,
-          payMethod: 'baofu_alipay',
-          orderSource: 'miniapp',
+          payMethod: 'baofu',
+          orderSource: 'alipay',
           createTime: '2026-06-26 09:15:00',
           payTime: '2026-06-26 09:16:30',
           refundReason: '支付渠道异常退款',
@@ -500,8 +496,8 @@ export default {
           orderAmount: 75.00,
           payAmount: 74.00,
           refundAmount: 75.00,
-          payMethod: 'huifu_weixin',
-          orderSource: 'app',
+          payMethod: 'huifu',
+          orderSource: 'alipay',
           createTime: '2026-06-26 11:30:00',
           payTime: '2026-06-26 11:45:12',
           refundReason: '充值未到账，申请退款',
@@ -523,8 +519,8 @@ export default {
           orderAmount: 100.00,
           payAmount: 98.00,
           refundAmount: 100.00,
-          payMethod: 'huifu_alipay',
-          orderSource: 'wechat_public',
+          payMethod: 'huifu',
+          orderSource: 'alipay',
           createTime: '2026-06-26 13:02:47',
           payTime: '2026-06-26 13:02:47',
           refundReason: '误操作充值，申请退款',
@@ -546,8 +542,8 @@ export default {
           orderAmount: 125.00,
           payAmount: 122.00,
           refundAmount: 125.00,
-          payMethod: 'baofu_weixin',
-          orderSource: 'miniapp',
+          payMethod: 'baofu',
+          orderSource: 'wechat',
           createTime: '2026-06-26 14:00:00',
           payTime: '2026-06-26 14:18:03',
           refundReason: '投币未使用，申请退还',
@@ -569,8 +565,8 @@ export default {
           orderAmount: 150.00,
           payAmount: 146.00,
           refundAmount: 150.00,
-          payMethod: 'baofu_weixin',
-          orderSource: 'h5',
+          payMethod: 'baofu',
+          orderSource: 'wechat',
           createTime: '2026-06-26 15:00:00',
           payTime: '2026-06-26 15:37:59',
           refundReason: '投币未使用，申请退还',
@@ -592,8 +588,8 @@ export default {
           orderAmount: 175.00,
           payAmount: 170.00,
           refundAmount: 175.00,
-          payMethod: 'baofu_weixin',
-          orderSource: 'h5',
+          payMethod: 'baofu',
+          orderSource: 'wechat',
           createTime: '2026-06-26 16:00:00',
           payTime: '2026-06-26 16:50:44',
           refundReason: '用户主动取消退款申请',
@@ -743,15 +739,13 @@ export default {
     },
     getPayMethodText(method) {
       const map = {
-        baofu_alipay: '宝付支付宝支付',
-        baofu_weixin: '宝付微信支付',
-        huifu_alipay: '汇付支付宝支付',
-        huifu_weixin: '汇付微信支付',
+        huifu: '汇付支付',
+        baofu: '宝付支付',
       };
       return map[method] || method;
     },
     getOrderSourceText(source) {
-      const map = { h5: 'H5', miniapp: '小程序', app: 'APP', wechat_public: '公众号' };
+      const map = { wechat: '微信', alipay: '支付宝' };
       return map[source] || source;
     },
   },
