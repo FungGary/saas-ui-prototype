@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>菜单缓存清除工具</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    h1 { color: #333; }
+    .info {
+      background: #e8f4fd;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+    }
+    .success {
+      background: #d4edda;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+      color: #155724;
+    }
+    .error {
+      background: #f8d7da;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+      color: #721c24;
+    }
+    button {
+      background: #409eff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin: 5px;
+    }
+    button:hover { background: #66b1ff; }
+    pre {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 菜单缓存清除和验证工具</h1>
+    
+    <div class="info">
+      <p><strong>问题：</strong>背包管理新版菜单没有显示</p>
+      <p><strong>原因：</strong>菜单已缓存到 localStorage，需要清除后重新加载</p>
+    </div>
+
+    <h2>步骤 1: 清除菜单缓存</h2>
+    <button onclick="clearMenuCache()">清除菜单缓存</button>
+    <div id="clearResult"></div>
+
+    <h2>步骤 2: 验证本地菜单配置</h2>
+    <button onclick="verifyLocalMenuConfig()">验证配置</button>
+    <div id="verifyResult"></div>
+
+    <h2>步骤 3: 重新加载应用</h2>
+    <button onclick="reloadApp()">重新加载页面</button>
+    
+    <h2>手动操作（备用方案）</h2>
+    <p>如果按钮不可用，请在浏览器控制台（F12）中执行以下命令：</p>
+    <pre>localStorage.removeItem('menuList');
+location.reload();</pre>
+    
+    <h2>查看调试日志</h2>
+    <p>重新加载页面后，打开浏览器控制台（F12），查找以 <code>[menuInject]</code> 和 <code>[菜单调试]</code> 开头的日志</p>
+  </div>
+
+  <script>
+    function clearMenuCache() {
+      const resultDiv = document.getElementById('clearResult');
+      try {
+        localStorage.removeItem('menuList');
+        resultDiv.innerHTML = '<div class="success">✅ 已成功清除菜单缓存！</div>';
+        console.log('菜单缓存已清除');
+      } catch (e) {
+        resultDiv.innerHTML = '<div class="error">❌ 清除失败：' + e.message + '</div>';
+      }
+    }
+
+    function verifyLocalMenuConfig() {
+      const resultDiv = document.getElementById('verifyResult');
+      const expectedConfig = {
+        path: '/admin/order/bag_new',
+        name: '背包管理新版',
+        title: '背包管理新版',
+        pid: 1,
+        is_show: 1,
+      };
+      
+      let html = '<div class="info">';
+      html += '<p><strong>期望的菜单配置：</strong></p>';
+      html += '<pre>' + JSON.stringify(expectedConfig, null, 2) + '</pre>';
+      html += '<p>请检查 <code>admin/src/config/localMenus.js</code> 中是否包含此配置</p>';
+      html += '</div>';
+      
+      resultDiv.innerHTML = html;
+    }
+
+    function reloadApp() {
+      if (confirm('确定要重新加载页面吗？\n\n将跳转到 http://localhost:8080')) {
+        window.location.href = 'http://localhost:8080';
+      }
+    }
+  </script>
+</body>
+</html>
